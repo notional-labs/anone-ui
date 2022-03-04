@@ -65,7 +65,7 @@ const FrontPage = () => {
                         Let have a kick around the comunity and the validators.
                     </p>
                     
-                    <a href="https://digchain.org/" target={'_blank'}>
+                    <a href="https://anone-testnet.notional.ventures/" target={'_blank'}>
                         <button style={{
                             border: 0,
                             borderRadius: '10px',
