@@ -39,7 +39,7 @@ jobs:
         npm ci --ignore-scripts
         npm run build
 
-    - name: Transfer /dist folder to server
+    - name: Transfer /build folder to server
       uses: garygrossgarten/github-action-scp@release
       with:
         local: build
