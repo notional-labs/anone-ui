@@ -5,6 +5,9 @@ axiosRetry(axios, { retries: 3 });
 
 export const getValidators = async (logoDisableFlag) => {
     const api = process.env.REACT_APP_API
+    const rpc = process.env.REACT_APP_RPC
+    console.log(api)
+    console.log(rpc)
     const URL = `${api}staking/validators`
     console.log(URL)
     const res = await axios.get(URL)
