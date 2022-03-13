@@ -54,15 +54,7 @@ const FrontPage = () => {
                         fontWeight: 10,
                         margin: 0
                     }}>
-                        Welcome to the Anone chain website.
-                    </p>
-                    <p style={{
-                        color: '#FFFFFF',
-                        fontSize: '24px',
-                        fontWeight: 10,
-                        margin: 0
-                    }}>
-                        Let have a kick around the comunity and the validators.
+                        Welcome to the Another-1 blockchain web 3.0 app. Have a kick around with the wallet and staking features.
                     </p>
                     
                     <a href="https://anone-testnet.notional.ventures/" target={'_blank'}>
