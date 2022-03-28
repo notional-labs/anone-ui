@@ -104,6 +104,31 @@ const App = () => {
     if (val === 'keplr') {
       const { accounts } = await getKeplr()
       if (accounts !== null) {
+<<<<<<< HEAD
+=======
+        if (!localStorage.getItem('accounts')) {
+          localStorage.setItem('accounts', JSON.stringify([{ account: accounts[0], type: 'keplr' }]))
+          setAccounts([...{ account: accounts[0], type: 'keplr' }])
+        }
+        else if (localStorage.getItem('accounts')) {
+          let accountsList = JSON.parse(localStorage.getItem('accounts'))
+          if (accountsList.filter(acc => acc.account.address === accounts[0].address).length === 0) {
+            accountsList.push({ account: accounts[0], type: 'keplr' })
+            localStorage.setItem('accounts', JSON.stringify(accountsList))
+            setAccounts([...accountsList])
+            warning('Success')
+          }
+          else {
+            warning('This wallet account already exist')
+          }
+        }
+      }
+    }
+    else {
+      let web3 = await getWeb3Instance();
+      try {
+        const accounts = (await web3.eth.getAccounts());
+>>>>>>> 8943229ecd4dc2a2b5bcfe3d6430634787624c2d
         if (!localStorage.getItem('accounts')) {
           localStorage.setItem('accounts', JSON.stringify([{ account: accounts[0], type: 'keplr' }]))
           setAccounts([{ account: accounts[0], type: 'keplr' }])
@@ -207,10 +232,35 @@ const App = () => {
             </li>
           </ul>
         </div>
+<<<<<<< HEAD
         <div style={{
           marginTop: '120px'
         }}>
           <p style={{
+=======
+      </div>
+      <Routes>
+        <Route exact path="/" element={<FrontPage />} />
+        <Route exact path="/staking" element={<ValidatorsList />} />
+        <Route exact path="/accounts" element={<AccountList accounts={accounts} wrapSetAccounts={wrapSetAccounts} />} />
+        <Route exact path="/accounts/:id" element={<AccountDetail accounts={accounts} />} />
+        <Route exact path="/proposals" element={<ProposalList />} />
+        <Route exact path="/proposals/:id" element={<ProposalDetail />} />
+      </Routes>
+      <div style={style.contact}>
+        <ul style={{ ...style.tabButton, listStyleType: 'none', }}>
+          <li style={{
+            fontSize: '2rem',
+            color: '#ffffff',
+            marginRight: '1em',
+          }}>
+            <a href='https://github.com/notional-labs' target='_blank'>
+              <GithubFilled style={{ color: '#ffffff', }} />
+            </a>
+          </li>
+          <li style={{
+            fontSize: '2.5rem',
+>>>>>>> 8943229ecd4dc2a2b5bcfe3d6430634787624c2d
             color: '#ffffff',
             fontSize: '24px',
             textAlign: 'left'
