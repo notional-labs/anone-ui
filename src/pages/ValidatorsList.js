@@ -2,15 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { Image, } from 'antd';
 import { getValidators, getLogo } from '../helpers/getValidators';
 import { getTotal } from '../helpers/getBalances';
-import "@fontsource/roboto"
+import "@fontsource/montserrat"
 import PacmanLoader from "react-spinners/PacmanLoader";
 import notFound from '../assets/img/no-profile.png'
 import { Modal, } from 'react-bootstrap';
 import DelegateModal from '../components/DelegateModal';
 import { getKeplr, } from '../helpers/getKeplr';
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom';
-import helmet from '../assets/img/Grouphelmet.png'
+import aos from 'aos';
 
 const style = {
     table: {
@@ -27,11 +26,11 @@ const style = {
     th: {
         padding: '10px 10px',
         textAlign: 'left',
-        fontWeight: 700,
+        fontWeight: 900,
         fontSize: '24px',
-        color: '#ffffff',
+        color: '#5dfc8a',
         textTransform: 'uppercase',
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
     },
     td: {
         padding: '0.7em',
@@ -40,16 +39,16 @@ const style = {
         textAlign: 'left',
         verticalAlign: 'middle',
         fontWeight: 700,
-        fontSize: '24px',
-        color: '#000000',
-        fontFamily: 'Roboto',
+        fontSize: '20px',
+        color: '#ffffff',
+        fontFamily: 'montserrat',
     },
     breadcrumb: {
         textAlign: 'left',
         fontWeight: 700,
-        fontSize: '24px',
+        fontSize: '20px',
         color: '#ffffff',
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         paddingBottom: '0.5em'
     },
 }
@@ -59,26 +58,41 @@ const ValidatorsList = () => {
     const [loading, setLoading] = useState(false)
     const [show, setShow] = useState(false)
     const [defaultVal, setDefaultVal] = useState(0)
-    const [setLogo, setSetLogo] = useState(false)
     const [state, setState] = useState('')
+    const [dummy, setDummy] = useState([])
 
     useEffect(() => {
         (async () => {
+            aos.init({
+                duration: 1000
+            })
             setLoading(true)
-            setSetLogo(false)
             let vals = await getValidators(true)
             const totalSupply = getTotal(vals)
-            vals.map((val) => {
-                val.votingPowerPercentage = parseFloat(val.delegator_shares * 100 / totalSupply).toFixed(2)
-            })
-            let promises = []
-            vals.forEach(val => {
-                promises.push(getLogo(val.description.identity))
-            })
-            Promise.all(promises).then((logos) => {
-                vals.map((val, index) => val.logo = logos[index])
-                setSetLogo(true)
-            })
+            vals = vals.filter(x => x)
+            if (vals.length > 0) {
+                let logoList = []
+                let urls = []
+                vals.map((val) => {
+                    val.votingPowerPercentage = parseFloat(val.delegator_shares * 100 / totalSupply).toFixed(2)
+                    urls.push(val.description.identity)
+                })
+
+                // Load avt from key
+                let promise = Promise.resolve()
+                urls.forEach((url, index) => {
+                    promise = promise.then(() => new Promise(resolve => {
+                        getLogo(url).then(img => {
+                            img ? vals[index].logo = img : vals[index].logo = notFound
+                            resolve()
+                        }).catch(() => {
+                            vals[index].logo = notFound
+                            resolve()
+                        })
+                        setDummy([...logoList])
+                    }))
+                })
+            }
             setValidators([...vals])
             setLoading(false)
         })()
@@ -127,38 +141,18 @@ const ValidatorsList = () => {
 
     return (
         !loading ? (
-            <div style={{ padding: 140, paddingTop: 0 }}>
-                <div style={style.breadcrumb}>
-                    <span>
-                        <Link to='/' style={{ color: '#ffffff', fontWeight: 500 }}>
-                            Homepage
-                        </Link>
-                    </span>
-                    <span style={{ color: '#ffffff', fontWeight: 500 }}>
-                        {' / '}
-                    </span>
-                    <span style={{ color: '#16ab40' }}>
-                        Staking
-                    </span>
-                </div>
+            <div style={{ padding: 70, paddingTop: '7em' }}>
                 <div style={{
                     textAlign: 'left',
-                    fontSize: '48px',
+                    fontSize: '36px',
                     color: '#ffffff',
-                    fontFamily: 'Roboto',
-                    fontWeight: 700,
-                    marginBottom: '1.3em'
+                    fontFamily: 'montserrat',
+                    fontWeight: 'bold',
+                    marginBottom: '20px'
                 }}>
                     VALIDATOR
                 </div>
-                <div style={{
-                    backgroundColor: '#27e35c',
-                    borderRadius: '30px',
-                    padding: 10,
-                    paddingLeft: 25,
-                    paddingRight: 25,
-                    paddingBottom: 25
-                }}>
+                <div>
                     <table style={style.table}>
                         <thead style={style.tblHeader}>
                             <tr>
@@ -167,13 +161,11 @@ const ValidatorsList = () => {
                                     <button style={{
                                         backgroundColor: 'transparent',
                                         border: 0,
-                                        fontWeight: '700',
-                                        fontSize: '1.3rem',
-                                        color: '#fff',
                                         textTransform: 'uppercase',
-                                        fontFamily: 'Roboto',
+                                        fontFamily: 'montserrat',
+                                        fontWeight: 'bold',
                                         padding: 10,
-                                        borderRadius: '20px'
+                                        borderRadius: '24px'
                                     }} onMouseEnter={handleOver}
                                         onMouseLeave={handleLeave}
                                         onClick={handleSort}>
@@ -188,49 +180,40 @@ const ValidatorsList = () => {
                         <tbody style={style.tblContent}>
                             {validators.map((val, index) => {
                                 return (
-                                    <tr key={index} style={{ backgroundColor: '#ffffff', marginBottom: 20 }}>
-                                        <td style={{ ...style.td, borderRadius: '30px 0 0 30px', }}>
+                                    <tr key={index} style={{ backgroundColor: 'transparent', marginBottom: 20, }}>
+                                        <td style={{ ...style.td, borderRadius: '10px 0 0 10px', border: 'solid 2px #26ff5c', borderRight: 'none' }}>
                                             <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                                <div style={{
-                                                    borderRadius: '50%',
-                                                    backgroundImage: setLogo ? `url(${val.logo})` || `url(${notFound})` : `url(${notFound})`,
-                                                    backgroundSize: 'cover',
-                                                    backgroundRepeat: 'no-repeat',
-                                                    backgroundPosition: 'center',
-                                                    width: '60px',
-                                                }}>
-                                                    {/* <Image
-                                                        width={45}
-                                                        src={helmet}
-                                                        style={{
-                                                            borderRadius: '100%',
-                                                            textAlign: 'left',
-                                                            position: 'relative',
-                                                            marginTop: '-70%',
-                                                            marginLeft: '-30%'
-                                                        }}
+                                                <div
+                                                    data-aos="flip-up"
+                                                    data-aos-once={true}
+                                                    style={{
+                                                        borderRadius: '50%',
+                                                        
+                                                    }}>
+                                                    <Image
+                                                        width={50}
+                                                        src={val.logo || notFound}
+                                                        style={{ borderRadius: '50%', marginTop: '3px' }}
                                                         preview={false}
-                                                    /> */}
+                                                    />
                                                 </div>
-
                                                 <div style={{ marginLeft: '1rem' }} >
-                                                    <div style={{ color: '#2C223E', fontSize: '24px', fontWeight: 700 }}>{val.description.moniker}</div>
-                                                    <div style={{ fontSize: '15px', fontWeight: 400 }}>{val.description.website ? val.description.website : val.description.identity}</div>
+                                                    <div style={{ color: '#ffffff', fontSize: '20px', fontWeight: 700 }}>{val.description.moniker}</div>
+                                                    <div style={{ fontSize: '15px', fontWeight: 400, opacity: 0.6 }}>{val.description.website ? val.description.website : val.description.identity}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style={{ ...style.td, textAlign: 'center' }}>
+                                        <td style={{ ...style.td, textAlign: 'center', border: 'solid 2px #26ff5c', borderRight: 'none', borderLeft: 'none' }}>
                                             <div>{`${parseInt(val.delegator_shares / 1000000)} AN1`}</div>
-                                            <div style={{ fontSize: '15px' }}>{`${val.votingPowerPercentage} %`} </div>
+                                            <div style={{ fontSize: '15px', opacity: 0.6 }}>{`${val.votingPowerPercentage} %`} </div>
                                         </td>
-                                        <td style={{ ...style.td, textAlign: 'center' }}>{`${val.commission.commission_rates.rate * 100} %`}</td>
-                                        <td style={{ ...style.td, textAlign: 'center', borderRadius: '0 30px 30px 0', color: '#ffffff' }}>
+                                        <td style={{ ...style.td, textAlign: 'center', border: 'solid 2px #26ff5c', borderRight: 'none', borderLeft: 'none' }}>{`${val.commission.commission_rates.rate * 100} %`}</td>
+                                        <td style={{ ...style.td, textAlign: 'center', borderRadius: '0 10px 10px 0', border: 'solid 2px #26ff5c', borderLeft: 'none', color: '#ffffff' }}>
                                             <button style={{
-                                                backgroundColor: '#631bf2',
+                                                backgroundColor: 'rgb(99, 27, 242)',
                                                 border: 'none',
-                                                borderRadius: '30px',
-                                                width: '60%',
-                                                padding: '1.5em',
+                                                borderRadius: '10px',
+                                                padding: '1em',
                                                 fontSize: '15px',
                                                 fontWeight: 700,
                                                 boxShadow: '0px 0px 10px 2px rgba(0, 0, 0, 0.25)'
@@ -248,9 +231,9 @@ const ValidatorsList = () => {
                     <Modal show={show} onHide={handleClose} backdrop="static" >
                         <Modal.Header style={{
                             backgroundColor: '#4D4D4D',
-                            color: '#27e35c',
-                            fontFamily: 'Roboto',
-                            fontSize: '24px',
+                            color: '#5dfc8a',
+                            fontFamily: 'montserrat',
+                            fontSize: '20px',
                             fontWeight: 400,
                             border: 0
                         }}>
@@ -266,7 +249,7 @@ const ValidatorsList = () => {
             </div >
         ) : (
             <div style={{ marginRight: '10rem', paddingTop: '10rem', height: '77vh' }}>
-                <PacmanLoader color={'#33d460'} loading={loading} size={100} />
+                <PacmanLoader color={'#7aff9e'} loading={loading} size={100} />
             </div>
         )
     )

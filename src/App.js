@@ -3,10 +3,9 @@ import { Modal, } from 'react-bootstrap';
 import { useCallback, useState } from 'react';
 import ConnectButton from './components/ConnectButton';
 import AccountDetail from './pages/AccountDetail';
-import { getKeplr, addDig } from './helpers/getKeplr';
+import { getKeplr } from './helpers/getKeplr';
 import ValidatorsList from './pages/ValidatorsList';
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Link,
@@ -15,17 +14,14 @@ import {
 } from "react-router-dom";
 import logo from './assets/img/another1_logo.png';
 import keplrLogo from './assets/img/keplr.png'
-import metaMaskLogo from './assets/img/metamask.png'
 import { Image, message } from 'antd';
-import { getWeb3Instance } from "./helpers/ethereum/lib/metamaskHelpers";
 import { GithubFilled, } from '@ant-design/icons'
-import "@fontsource/roboto"
+import "@fontsource/montserrat"
 import AccountList from './pages/AccountList';
 import ProposalList from './pages/ProposalList';
-import { FaDiscord, FaTelegramPlane } from "react-icons/fa";
+import { FaDiscord } from "react-icons/fa";
 import ProposalDetail from './pages/ProposalDetail';
 import FrontPage from './pages/FrontPage';
-
 
 const style = {
   button: {
@@ -37,18 +33,18 @@ const style = {
     justifyContent: 'space-between'
   },
   navbar: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 140,
-    paddingTop: 20,
-    paddingBottom: '6em',
+    padding: 50,
+    paddingTop: 0,
+    paddingBottom: 50,
+    backgroundColor: '#4D4D4D',
   },
   tabButton: {
     display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    verticalAlign: 'center'
+    flexDirection: 'column',
+    justifyContent: 'start',
+    verticalAlign: 'center',
+    textAlign: 'left',
+    paddingLeft: 0
   },
   buttonContent: {
     display: 'flex',
@@ -62,6 +58,14 @@ const style = {
     padding: 90,
     paddingTop: 0,
     paddingBottom: 0
+  },
+  li: {
+    textAlign: 'left',
+    paddingBottom: '2em'
+  },
+  contactText: {
+    color: '#ffffff',
+    fontSize: '16px'
   }
 }
 
@@ -86,38 +90,28 @@ const App = () => {
     message.warning(val, 1)
   }
 
+  const handleEnter = (e) => {
+    e.target.style.color = '#5dfc8a'
+  }
+
+  const handleLeave = (e, tabName) => {
+    if (!location.pathname.includes(tabName)) {
+      e.target.style.color = '#ffffff'
+    }
+  }
+
   const connect = async (val) => {
     if (val === 'keplr') {
       const { accounts } = await getKeplr()
-      console.log(accounts)
-      if (!localStorage.getItem('accounts')) {
-        localStorage.setItem('accounts', JSON.stringify([{ account: accounts[0], type: 'keplr' }]))
-        setAccounts([...{ account: accounts[0], type: 'keplr' }])
-      }
-      else if (localStorage.getItem('accounts')) {
-        let accountsList = JSON.parse(localStorage.getItem('accounts'))
-        if (accountsList.filter(acc => acc.account.address === accounts[0].address).length === 0) {
-          accountsList.push({ account: accounts[0], type: 'keplr' })
-          localStorage.setItem('accounts', JSON.stringify(accountsList))
-          setAccounts([...accountsList])
-          warning('Success')
-        }
-        else {
-          warning('This wallet account already exist')
-        }
-      }
-    }
-    else {
-      let web3 = await getWeb3Instance();
-      try {
-        const accounts = (await web3.eth.getAccounts());
+      if (accounts !== null) {
         if (!localStorage.getItem('accounts')) {
-          localStorage.setItem('accounts', JSON.stringify([{ account: accounts[0], type: 'metamask' }]))
+          localStorage.setItem('accounts', JSON.stringify([{ account: accounts[0], type: 'keplr' }]))
+          setAccounts([{ account: accounts[0], type: 'keplr' }])
         }
-        if (localStorage.getItem('accounts')) {
+        else if (localStorage.getItem('accounts')) {
           let accountsList = JSON.parse(localStorage.getItem('accounts'))
-          if (accountsList.filter(acc => acc.type === "metamask" && acc.account === accounts[0]).length === 0) {
-            accountsList.push({ account: accounts[0], type: 'metamask' })
+          if (accountsList.filter(acc => acc.account.address === accounts[0].address).length === 0) {
+            accountsList.push({ account: accounts[0], type: 'keplr' })
             localStorage.setItem('accounts', JSON.stringify(accountsList))
             setAccounts([...accountsList])
             warning('Success')
@@ -126,19 +120,22 @@ const App = () => {
             warning('This wallet account already exist')
           }
         }
-      } catch {
-        warning('Check if you have login into Metmask')
       }
-      //metamask logic
     }
   }
 
   return (
-    <div className="App container-fluid">
+    <div className="App">
       <div style={style.navbar}>
-        <div style={{ paddingTop: '1rem' }}>
+        <div style={{
+          textAlign: 'left',
+          borderBottom: 'solid 2px #5dfc8a',
+          padding: 50,
+          paddingLeft: 0,
+          paddingRight: 100
+        }}>
           <Link to='/'>
-            <Image width={100}
+            <Image width={90}
               src={logo}
               preview={false}
             />
@@ -147,118 +144,123 @@ const App = () => {
         <div className='nav-bar'>
           <ul
             className='nav-button'
-            style={{ listStyleType: 'none', paddingTop: '30px' }}>
-            <li>
+            style={{ listStyleType: 'none', alignItems: 'left' }}>
+            <li style={style.li}>
               <NavLink to='/accounts'>
                 <button style={{
-                  marginRight: '3.5em',
-                  fontSize: '24px',
+                  fontSize: '20px',
                   backgroundColor: 'transparent',
-                  color: '#ffffff',
+                  color: location.pathname.includes('/accounts') ? '#5dfc8a' : '#ffffff',
                   padding: 0,
                   paddingTop: 5,
                   paddingBottom: 30,
                   border: 0,
-                  fontFamily: 'Roboto',
-                  borderBottom: location.pathname.includes('/accounts') ? 'solid 2px #27e35c' : 'none',
+                  fontFamily: 'montserrat',
                   lineHeight: '100%',
                   fontStyle: 'regular',
-                }}>
+                  fontWeight: 'bold'
+                }} className='nav-link'>
                   Accounts
                 </button>
               </NavLink>
             </li>
-            <li>
+            <li style={style.li}>
               <NavLink to='/staking'>
                 <button style={{
-                  marginRight: '3.5em',
-                  fontSize: '24px',
+                  fontSize: '20px',
                   backgroundColor: 'transparent',
-                  color: '#ffffff',
+                  color: location.pathname.includes('/staking') ? '#5dfc8a' : '#ffffff',
                   padding: 0,
                   paddingTop: 5,
                   paddingBottom: 30,
                   border: 0,
-                  fontFamily: 'Roboto',
-                  borderBottom: location.pathname.includes('/staking') ? 'solid 2px #27e35c' : 'none',
+                  fontFamily: 'montserrat',
                   lineHeight: '100%',
-                  fontStyle: 'regular'
-                }}>
+                  fontStyle: 'regular',
+                  fontWeight: 'bold'
+                }} className='nav-link'>
                   Staking
                 </button>
               </NavLink>
             </li>
-            {/* <li>
+            <li style={style.li}>
               <NavLink to='/proposals'>
                 <button style={{
-                  marginRight: '3.5em',
-                  fontSize: '24px',
+                  fontSize: '20px',
                   backgroundColor: 'transparent',
-                  color: '#ffffff',
+                  color: location.pathname.includes('/proposals') ? '#5dfc8a' : '#ffffff',
                   padding: 0,
                   paddingTop: 5,
                   paddingBottom: 30,
                   border: 0,
-                  fontFamily: 'Roboto',
-                  borderBottom: location.pathname.includes('/proposals') ? 'solid 2px #27e35c' : 'none',
+                  fontFamily: 'montserrat',
                   lineHeight: '100%',
-                  fontStyle: 'regular'
-                }}>
+                  fontStyle: 'regular',
+                  fontWeight: 'bold'
+                }} className='nav-link'>
                   Proposals
                 </button>
               </NavLink>
-            </li> */}
-            <li>
+            </li>
+            <li style={style.li}>
               <ConnectButton wrapSetShow={wrapSetShow} />
             </li>
           </ul>
         </div>
+        <div style={{
+          marginTop: '120px'
+        }}>
+          <p style={{
+            color: '#ffffff',
+            fontSize: '24px',
+            textAlign: 'left'
+          }}>Contact</p>
+          <ul style={{ ...style.tabButton, listStyleType: 'none', }}>
+            <li style={{
+              fontSize: '2rem',
+              color: '#ffffff',
+              marginRight: '1em',
+            }}>
+              <a href='https://github.com/notional-labs' target='_blank'>
+                <GithubFilled style={{ color: '#ffffff', fontSize: '30px', marginRight: '20px' }} />
+                <span style={style.contactText}>
+                  Github
+                </span>
+              </a>
+            </li>
+            <li style={{
+              fontSize: '2.5rem',
+              color: '#ffffff',
+              marginRight: '1em',
+            }}>
+              <a href='https://discord.gg/UTNjQbGA' target='_blank'>
+                <FaDiscord style={{ color: '#ffffff', fontSize: '30px', marginRight: '20px' }} />
+                <span style={style.contactText}>
+                  Discord
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-      <Routes>
-        <Route exact path="/" element={<FrontPage/>} />
-        <Route exact path="/staking" element={<ValidatorsList />} />
-        <Route exact path="/accounts" element={<AccountList accounts={accounts} wrapSetAccounts={wrapSetAccounts} />} />
-        <Route exact path="/accounts/:id" element={<AccountDetail accounts={accounts} />} />
-        <Route exact path="/proposals" element={<ProposalList />} />
-        <Route exact path="/proposals/:id" element={<ProposalDetail />} />
-      </Routes>
-      <div style={style.contact}>
-        <ul style={{ ...style.tabButton, listStyleType: 'none', }}>
-          <li style={{
-            fontSize: '2rem',
-            color: '#ffffff',
-            marginRight: '1em',
-          }}>
-            <a href='https://github.com/notional-labs' target='_blank'>
-              <GithubFilled style={{ color: '#ffffff', }} />
-            </a>
-          </li>
-          <li style={{
-            fontSize: '2.5rem',
-            color: '#ffffff',
-            marginRight: '1em',
-          }}>
-            <a href='https://discord.gg/UTNjQbGA' target='_blank'>
-              <FaDiscord style={{ color: '#ffffff', }} />
-            </a>
-          </li>
-          {/* <li style={{
-            fontSize: '2.5rem',
-            color: '#ffffff',
-            marginRight: '1em',
-          }}>
-            <a href='https://t.me/digchain_official' target='_blank'>
-              <FaTelegramPlane style={{ color: '#ffffff', }} />
-            </a>
-          </li> */}
-        </ul>
+      <div style={{ margin: '0 auto', width: '100%', overflow: 'hidden', position: 'relative' }}>
+        <div style={{position: 'relative', zIndex: 1}}>
+          <Routes>
+            <Route exact path="/" element={<FrontPage />} />
+            <Route exact path="/staking" element={<ValidatorsList />} />
+            <Route exact path="/accounts" element={<AccountList accounts={accounts} wrapSetAccounts={wrapSetAccounts} />} />
+            <Route exact path="/accounts/:id" element={<AccountDetail accounts={accounts} />} />
+            <Route exact path="/proposals" element={<ProposalList accounts={accounts} />} />
+            <Route exact path="/proposals/:id" element={<ProposalDetail accounts={accounts} />} />
+          </Routes>
+        </div>
       </div>
       <>
         <Modal className="border-radius-20" show={show} onHide={handleClose} centered={true}>
           <Modal.Header style={{
             backgroundColor: '#4D4D4D',
-            color: '#27e35c',
-            fontFamily: 'roboto',
+            color: '#5dfc8a',
+            fontFamily: 'montserrat',
             fontSize: '24px',
             border: 0,
             padding: '20px',
@@ -294,30 +296,6 @@ const App = () => {
                   </div>
                 </div>
               </button>
-              {/* <button style={{
-                backgroundColor: 'transparent',
-                color: '#ffffff',
-                marginTop: '1em',
-                border: 0
-              }}
-                onClick={async () => {
-                  await connect('metamask')
-                  setShow(false)
-                }}>
-                <div style={style.buttonContent}>
-                  <div>
-                    <Image width={50}
-                      src={metaMaskLogo}
-                      preview={false} />
-                  </div>
-                  <div style={{ marginLeft: '25px', fontSize: '1.5rem' }}>
-                    <p style={{ margin: 0, textAlign: 'left', }}>Metamask</p>
-                    <p style={{ fontSize: '0.75rem', }}>
-                      Metamask browser extension
-                    </p>
-                  </div>
-                </div>
-              </button> */}
             </div>
           </Modal.Body>
         </Modal>

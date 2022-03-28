@@ -1,12 +1,9 @@
-import { Input, InputNumber, message, notification, Checkbox } from "antd"
+import { Input, InputNumber, notification, Checkbox } from "antd"
 import { transfer } from "../helpers/transaction"
 import { useEffect, useState } from 'react'
 import { getBalance } from "../helpers/getBalances";
 import { getKeplr, getStargateClient } from "../helpers/getKeplr";
 
-import { makeSendMsg, makeSignDocSendMsg, } from "../helpers/ethereum/lib/eth-transaction/Msg"
-import { broadcastTransaction } from "../helpers/ethereum/lib/eth-broadcast/broadcastTX"
-import { getWeb3Instance } from "../helpers/ethereum/lib/metamaskHelpers";
 import ClipLoader from "react-spinners/ClipLoader"
 
 const style = {
@@ -44,7 +41,7 @@ const style = {
         marginBottom: 10
     },
     formTitle: {
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         color: '#ffffff',
         fontWeight: 400,
         fontSize: '15px'
@@ -142,35 +139,6 @@ const TransferModal = ({ account, wrapSetShow }) => {
                 })
             }
         }
-        else {
-            let web3 = await getWeb3Instance();
-            const denom = process.env.REACT_APP_DENOM
-            const chainId = process.env.REACT_APP_CHAIN_ID
-            const memo = "Love From Dev Team"
-
-            const gasLimit = parseInt(gasAmount)
-
-            const amount = value * 1000000
-
-            const msgDelegate = makeSendMsg(account.account, address, amount, denom)
-            const signDocDelegate = makeSignDocSendMsg(account.account, address, amount, denom)
-
-            const UIProcessing = function () {
-                setIsDoingTx(false)
-                wrapSetShow(false)
-            }
-
-            await broadcastTransaction(account.account, msgDelegate, signDocDelegate, chainId, memo, gasLimit, web3, UIProcessing).then((data) => {
-                // setIsDoingTx(false)
-                // wrapSetShow(false)
-                // success()
-            }).catch((e) => {
-                setIsDoingTx(false)
-                wrapSetShow(false)
-                error(e.message)
-            })
-
-        }
     }
 
     return (
@@ -260,7 +228,7 @@ const TransferModal = ({ account, wrapSetShow }) => {
                 </div>
             </div>
             <div>
-                <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'Roboto' }}>Advance</Checkbox>
+                <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'montserrat' }}>Advance</Checkbox>
             </div>
             {
                 showAdvance && (
@@ -331,7 +299,7 @@ const TransferModal = ({ account, wrapSetShow }) => {
                         fontSize: '15px',
                         backgroundColor: '#C4C4C4',
                         color: '#ffffff',
-                        fontFamily: 'Roboto',
+                        fontFamily: 'montserrat',
                         marginRight: '20px'
                     }}>
                     Cancel
@@ -344,9 +312,9 @@ const TransferModal = ({ account, wrapSetShow }) => {
                         width: '20%',
                         height: '2.5rem',
                         fontSize: '15px',
-                        backgroundColor: '#67d686',
+                        backgroundColor: 'rgb(103, 214, 134)',
                         color: '#ffffff',
-                        fontFamily: 'Roboto'
+                        fontFamily: 'montserrat'
                     }}>
                     Send
                 </button>

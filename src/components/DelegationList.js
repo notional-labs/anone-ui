@@ -20,26 +20,26 @@ const style = {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        color: '#ffffff'
     },
     button: {
         border: 0,
         borderRadius: '10px',
-        width: '100%',
         marginBottom: 0,
         marginLeft: 0,
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         fontWeight: 300,
-        backgroundColor: '#27e35c',
+        backgroundColor: 'rgb(99, 27, 242)',
         color: '#FFFFFF',
-        padding: '2em',
+        padding: '20px',
         paddingTop: '1em',
         paddingBottom: '1em'
     },
     actionButton: {
-        border: 'solid 2px #3B2D52',
+        border: 'solid 2px #ffffff',
         backgroundColor: 'transparent',
         padding: 5,
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         fontSize: '1rem'
     },
     table: {
@@ -47,7 +47,7 @@ const style = {
     },
     tdlHeader: {
         backgroundColor: 'transparent',
-        borderBottom: 'solid 1px black'
+        borderBottom: 'solid 1px #ffffff'
     },
     tdlContent: {
         marginTop: '0px',
@@ -57,11 +57,11 @@ const style = {
     th: {
         padding: '15px 15px',
         textAlign: 'left',
-        fontWeight: '700',
-        fontSize: '15px',
-        color: '#000000',
+        fontWeight: 'bold',
+        fontSize: '24px',
+        color: '#ffffff',
         textTransform: 'uppercase',
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
     },
     td: {
         padding: '15px',
@@ -69,8 +69,8 @@ const style = {
         verticalAlign: '500',
         fontWeight: 'lighter',
         fontSize: '17px',
-        color: '#000000',
-        fontFamily: 'Roboto',
+        color: '#ffffff',
+        fontFamily: 'montserrat',
         width: '20%',
         lineHeight: '18px'
     }
@@ -146,15 +146,15 @@ const DelegationList = ({ address, type, delegations, rewards, }) => {
     }
 
     return (
-        <div style={{ padding: 20 }}>
+        <div>
             <div style={style.container}>
-                <Title style={{ color: '#FFFFFF', fontSize: '24px', fontWeight: 700, fontFamily: 'Roboto' }}>
+                <Title style={{ color: '#26ff5c', fontSize: '36px', fontWeight: 'bold', fontFamily: 'montserrat' }}>
                     Delegations
                 </Title>
             </div>
-            <div style={{ backgroundColor: 'rgb(255, 255, 255, 1)', borderRadius: '20px', padding: '2em', paddingTop: '1em', paddingBottom: '1em' }}>
+            <div style={{ borderRadius: '10px', border: 'solid 2px #5dfc8a', padding: '1em' }}>
                 <div style={{ width: '8%', float: 'right', marginBottom: '1em' }}>
-                    <Link to='/staking' style={{ width: '30%' }}>
+                    <Link to='/staking'>
                         <button style={style.button}>
                             Delegate
                         </button>
@@ -173,7 +173,7 @@ const DelegationList = ({ address, type, delegations, rewards, }) => {
                         <tbody style={style.tdlContent}>
                             {rewards.map((reward, index) => {
                                 return (
-                                    <tr key={index} style={{ backgroundColor: '#ffffff', }}>
+                                    <tr key={index}>
                                         <td style={style.td}>
                                             {validators.filter(x => x.operator_address === reward.validator_address).length > 0 && validators.filter(x => x.operator_address === reward.validator_address)[0].description.moniker}
                                         </td>
@@ -222,8 +222,8 @@ const DelegationList = ({ address, type, delegations, rewards, }) => {
                 <Modal show={showWithdraw} onHide={handleCloseWithdraw} backdrop="static" >
                     <Modal.Header style={{
                         backgroundColor: '#4D4D4D',
-                        color: '#27e35c',
-                        fontFamily: 'Roboto',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
                         fontSize: '24px',
                         fontWeight: 400,
                         border: 0
@@ -244,8 +244,8 @@ const DelegationList = ({ address, type, delegations, rewards, }) => {
                 <Modal show={showRedelegate} onHide={handleCloseRedelegate} backdrop="static" >
                     <Modal.Header style={{
                         backgroundColor: '#4D4D4D',
-                        color: '#27e35c',
-                        fontFamily: 'Roboto',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
                         fontSize: '24px',
                         fontWeight: 400,
                         border: 0
@@ -267,8 +267,8 @@ const DelegationList = ({ address, type, delegations, rewards, }) => {
                 <Modal show={showUnbonding} onHide={handleCloseUnbond} backdrop="static" >
                     <Modal.Header style={{
                         backgroundColor: '#4D4D4D',
-                        color: '#27e35c',
-                        fontFamily: 'Roboto',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
                         fontSize: '24px',
                         fontWeight: 400,
                         border: 0

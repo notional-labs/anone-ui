@@ -1,45 +1,83 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-    useParams
+    useParams,
+    Link
 } from "react-router-dom";
 import { getProposal, getProposer, getTally } from "../helpers/getProposal";
 import '../assets/css/ProposalDetail.css'
 import VoterList from "../components/VoterList";
 import { Modal } from "react-bootstrap";
 import VoteModal from "../components/VoteModal";
+import { RiBarChart2Fill } from "react-icons/ri";
+import CreateProposalModal from "../components/CreateProposalModal";
+import DepositModal from "../components/DepositModal";
+import { FaCoins } from "react-icons/fa";
 
 const style = {
     card: {
-        backgroundColor: 'rgb(255, 255, 255)',
-        padding: '2em',
-        borderRadius: '20px',
+        borderRadius: '10px',
         minHeight: '100%',
-        fontFamily: 'Lato',
+        fontFamily: 'montserrat',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        marginBottom: '2em'
+        marginBottom: '2em',
+        color: '#ffffff',
     },
     title: {
         textAlign: 'left',
         fontWeight: 'bold',
         fontSize: '1.3rem',
+        color: '#5dfc8a'
     },
     content: {
         textAlign: 'left',
+        padding: '40px',
+        borderRadius: '10px',
+        border: 'solid 2px #5dfc8a'
     },
     voters: {
-        backgroundColor: 'rgb(255, 255, 255)',
         borderRadius: '10px',
-        marginBottom: '20px',
-        color: '#bdbdbd',
-        fontFamily: 'Ubuntu',
-        marginTop: '5rem',
-        padding: 20
+        color: '#ffffff',
+        fontFamily: 'montserrat',
+        marginTop: 0
+    },
+    breadcrumb: {
+        textAlign: 'left',
+        fontWeight: 700,
+        fontSize: '24px',
+        color: '#ffffff',
+        fontFamily: 'montserrat',
+        paddingBottom: '50px'
+    },
+    buttonBox: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: '20 20 20 20',
+        marginTop: '1.5em',
+    },
+    detail: {
+        padding: '1em',
+        borderRadius: '10px',
+        fontWeight: 'bold',
+        width: '150px',
+        backgroundColor: '#C4C4C4',
+        color: '#000000',
+        border: 0
+    },
+    extraButton: {
+        padding: '1em',
+        borderRadius: '10px',
+        fontWeight: 'bold',
+        backgroundColor: '#1D5470',
+        color: '#ffffff',
+        width: '150px',
+        border: 0
     },
 }
 
-const ProposalDetail = () => {
+const ProposalDetail = ({ accounts }) => {
     const [proposal, setProposal] = useState([])
     const [proposer, setProposer] = useState({
         proposal_id: -1,
@@ -47,6 +85,8 @@ const ProposalDetail = () => {
     })
     let { id } = useParams();
     const [show, setShow] = useState(false)
+    const [showCreateProposal, setShowCreateProposal] = useState(false)
+    const [showDeposit, setShowDeposit] = useState(false)
 
     useEffect(() => {
         (async () => {
@@ -70,19 +110,39 @@ const ProposalDetail = () => {
         setShow(val)
     }, [setShow])
 
+    const handleCloseCreateProposal = () => {
+        setShowCreateProposal(false)
+    }
+
+    const wrapSetShowCreateProposal = useCallback((val) => {
+        setShowCreateProposal(val)
+    }, [setShowCreateProposal])
+
+    const wrapSetShowDeposit = useCallback((val) => {
+        setShowDeposit(val)
+    }, [setShowDeposit])
+
+    const getTime = (string) => {
+        const date = new Date(string)
+        const hour = date.getHours()
+        const minute = date.getMinutes()
+        const second = date.getSeconds()
+        return `${hour}:${minute}:${second}`
+    }
+
     console.log(proposal[0])
 
     const getStatus = () => {
         if (proposal[0].status === 3) {
             return (
                 <span style={{
-                    color: '#28c76f',
-                    backgroundColor: 'rgba(40,199,111,.12)',
-                    fontWeight: 'bold',
-                    padding: '0.5em',
-                    borderRadius: '100px',
+                    color: '#ffffff',
+                    backgroundColor: '#2A9D8F',
+                    fontWeight: '400',
+                    padding: '0.3em',
+                    borderRadius: '5px',
                     marginRight: '0.5em',
-                    marginLeft: '0.5em'
+                    marginLeft: '0.5em',
                 }}>
                     Passed
                 </span>)
@@ -90,11 +150,11 @@ const ProposalDetail = () => {
         else if (proposal[0].status === 4) {
             return (
                 <span style={{
-                    color: '#ea5455',
-                    backgroundColor: 'rgba(234,84,85,.12)',
-                    fontWeight: 'bold',
-                    padding: '0.5em',
-                    borderRadius: '100px',
+                    color: '#ffffff',
+                    backgroundColor: '#E76F51',
+                    fontWeight: '400',
+                    padding: '0.3em',
+                    borderRadius: '5px',
                     marginRight: '0.5em',
                     marginLeft: '0.5em'
                 }}>
@@ -105,11 +165,11 @@ const ProposalDetail = () => {
         else if (proposal[0].status === 1) {
             return (
                 <span style={{
-                    color: '#00cfe8',
+                    color: '#ffffff',
                     backgroundColor: 'rgba(0,207,232,.12)',
-                    fontWeight: 'bold',
-                    padding: '0.5em',
-                    borderRadius: '100px',
+                    fontWeight: '400',
+                    padding: '0.3em',
+                    borderRadius: '5px',
                     marginRight: '0.5em',
                     marginLeft: '0.5em'
                 }}>
@@ -120,46 +180,99 @@ const ProposalDetail = () => {
         else {
             return (
                 <span style={{
-                    color: '#7367f0',
-                    backgroundColor: 'rgba(115,103,240,.12)',
-                    fontWeight: 'bold',
-                    padding: '0.5em',
-                    borderRadius: '100px',
+                    color: '#ffffff',
+                    backgroundColor: '#1D5470',
+                    fontWeight: '400',
+                    padding: '0.3em',
+                    borderRadius: '5px',
                     marginRight: '0.5em',
-                    marginLeft: '0.5em'
+                    marginLeft: '0.5em',
                 }}>
                     Voting
                 </span>
             )
         }
     }
+
+    const handleClick = () => {
+        setShow(true)
+    }
+
+    const handleClickCreateProposal = () => {
+        setShowCreateProposal(true)
+    }
+
+    const handleEnter = (e) => {
+        e.target.style.backgroundImage = 'Linear-Gradient(263.6deg, #4D4D4D 0%, #000000 100%)'
+        e.target.style.border = 'solid 2px #5dfc8a'
+    }
+
+    const handleLeave = (e) => {
+        e.target.style.backgroundImage = 'Linear-Gradient(#2eff66 0%, #5956fc 100%)'
+    }
+
+    const handleClickDeposit = () => {
+        wrapSetShowDeposit(true)
+    }
+
     return (
         <div style={{
-            padding: 50,
-            paddingTop: 20
+            padding: 70,
+            paddingTop: '7em'
         }}>
             <div style={{
-                fontSize: '3rem',
-                color: '#EFCF20',
-                fontFamily: 'Ubuntu',
-                fontWeight: 600,
                 display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'left',
-                marginBottom: '0.5em'
+                justifyContent: 'space-between'
             }}>
-                Proposal Details
+                <div style={{
+                    textAlign: 'left',
+                    fontSize: '36px',
+                    color: '#ffffff',
+                    fontFamily: 'montserrat',
+                    fontWeight: 'bold',
+                    marginBottom: '20px'
+                }}>
+                    DETAILS
+                </div>
+                <div>
+                    <button
+                        onClick={handleClickCreateProposal}
+                        style={{
+                            backgroundImage: 'Linear-Gradient(#2eff66 0%, #5956fc 100%)',
+                            border: 'solid 2px #5dfc8a',
+                            color: '#ffffff',
+                            fontWeight: 700,
+                            fontSize: '24px',
+                            padding: '10px 20px 10px 20px',
+                            borderRadius: '10px'
+                        }} onMouseOver={handleEnter} onMouseLeave={handleLeave}>
+                        Create Proposal
+                    </button>
+                </div>
+            </div>
+            <div style={style.breadcrumb}>
+                <span style={{ color: '#ffffff', fontWeight: 500 }}>
+                    <Link to='/proposals' style={{ color: '#ffffff', fontWeight: 500 }}>
+                        Proposals
+                    </Link>
+                </span>
+                <span style={{ color: '#ffffff', fontWeight: 500 }}>
+                    {' / '}
+                </span>
+                <span style={{ color: '#26ff5c' }}>
+                    Details
+                </span>
             </div>
             <div style={style.card}>
-                <div style={style.title}>
-                    <p className='title' style={style.title}>
-                        #{proposal.length > 0 && proposal[0].id}
-                        {proposal.length > 0 && getStatus()}
-                        {proposal.length > 0 && proposal[0].content.value.title}
-                    </p>
-                </div>
                 <div style={style.content}>
-                    <div className="line" style={{ backgroundColor: '#cccccc' }}>
+                    <div style={style.title}>
+                        <p className='title' style={style.title}>
+                            <span style={{ fontWeight: 'bold' }}>#{proposal.length > 0 && proposal[0].id}</span>
+                            {proposal.length > 0 && getStatus()}
+                            {proposal.length > 0 && proposal[0].content.value.title}
+                        </p>
+                    </div>
+                    <div className="line" >
                         <p className="left">
                             Proposal ID
                         </p>
@@ -171,11 +284,13 @@ const ProposalDetail = () => {
                         <p className="left">
                             Proposer
                         </p>
-                        <p className="right">
-                            {proposer.proposer}
-                        </p>
+                        <Link className="right" to={`/accounts/${proposer.proposer}`} style={{ textAlign: 'left' }}>
+                            <p style={{ color: '#26ff5c' }}>
+                                {proposer.proposer}
+                            </p>
+                        </Link>
                     </div>
-                    <div className="line" style={{ backgroundColor: '#cccccc' }}>
+                    <div className="line" >
                         <p className="left">
                             Total Deposit
                         </p>
@@ -191,16 +306,16 @@ const ProposalDetail = () => {
                         </p>
                         <p className="right">
                             {proposal.length > 0 &&
-                                `${proposal[0].submit_time.split('T')[0]} ${proposal[0].submit_time.split('T')[1]}`}
+                                `${proposal[0].submit_time.split('T')[0]} ${getTime(proposal[0].submit_time)}`}
                         </p>
                     </div>
-                    <div className="line" style={{ backgroundColor: '#cccccc' }}>
+                    <div className="line" >
                         <p className="left">
                             Voting Time
                         </p>
                         <p className="right">
                             {proposal.length > 0 &&
-                                `${proposal[0].voting_start_time.split('T')[0]} ${proposal[0].voting_start_time.split('T')[1]}-${proposal[0].voting_end_time.split('T')[0]} ${proposal[0].voting_end_time.split('T')[1]}`}
+                                `${proposal[0].voting_start_time.split('T')[0]} ${getTime(proposal[0].voting_start_time)}  -  ${proposal[0].voting_end_time.split('T')[0]} ${getTime(proposal[0].voting_end_time)}`}
                         </p>
                     </div>
                     <div className="line">
@@ -211,7 +326,7 @@ const ProposalDetail = () => {
                             {proposal.length > 0 && proposal[0].content.type}
                         </p>
                     </div>
-                    <div className="line" style={{ backgroundColor: '#cccccc' }}>
+                    <div className="line" >
                         <p className="left">
                             Title
                         </p>
@@ -227,20 +342,87 @@ const ProposalDetail = () => {
                             {proposal.length > 0 && proposal[0].content.value.description}
                         </p>
                     </div>
+                    <div style={{ borderTop: 'solid 1.5px #ffffff' }} />
+                    <div style={style.buttonBox}>
+                        <Link to={`/proposals`}>
+                            <button style={style.detail}>
+                                Back to List
+                            </button>
+                        </Link>
+                        {
+                            proposal.length > 0 && proposal[0].status === 2 && (
+                                <button style={style.extraButton} onClick={handleClick}>
+                                    <RiBarChart2Fill style={{ fontSize: '1.5em' }} /> Vote
+                                </button>
+                            )
+                        }
+                        {
+                            proposal.length > 0 && proposal[0].status === 1 && (
+                                <button style={style.extraButton} onClick={handleClickDeposit}>
+                                    <FaCoins style={{ marginRight: '5px' }} />Deposit
+                                </button>
+                            )
+                        }
+                    </div>
                 </div>
             </div>
-            <div style={{ ...style.voters, marginTop: '0', paddingTop: '2em' }} >
+            <div style={{ ...style.voters }} >
                 {proposal.length > 0 && <VoterList proposal={proposal[0]} />}
             </div>
             <>
                 <Modal show={show} onHide={handleClose} backdrop="static" >
-                    <Modal.Header style={{ backgroundColor: '#d6d6d6', color: '#696969', fontFamily: 'ubuntu', fontSize: '1.2rem', fontWeight: 600 }}>
+                    <Modal.Header style={{
+                        backgroundColor: '#4D4D4D',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        border: 0
+                    }}>
                         <div>
                             Vote
                         </div>
                     </Modal.Header>
-                    <Modal.Body style={{ backgroundColor: '#1f1f1f', }}>
-                        {proposal.length > 0 && <VoteModal proposal={proposal[0]} wrapSetShow={wrapSetShow} />}
+                    <Modal.Body style={{ backgroundColor: '#4D4D4D', }}>
+                        {proposal.length > 0 && <VoteModal proposal={proposal[0]} id={proposal[0].id} wrapSetShow={wrapSetShow} />}
+                    </Modal.Body>
+                </Modal>
+            </>
+            <>
+                <Modal show={showCreateProposal} onHide={handleCloseCreateProposal} backdrop="static" >
+                    <Modal.Header style={{
+                        backgroundColor: '#4D4D4D',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        border: 0
+                    }}>
+                        <div>
+                            Create Proposal
+                        </div>
+                    </Modal.Header>
+                    <Modal.Body style={{ backgroundColor: '#4D4D4D', }}>
+                        <CreateProposalModal accounts={accounts} wrapSetShow={wrapSetShowCreateProposal} />
+                    </Modal.Body>
+                </Modal>
+            </>
+            <>
+                <Modal show={showDeposit} onHide={handleClose} backdrop="static" >
+                    <Modal.Header style={{
+                        backgroundColor: '#4D4D4D',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        border: 0
+                    }}>
+                        <div>
+                            Deposit
+                        </div>
+                    </Modal.Header>
+                    <Modal.Body style={{ backgroundColor: '#4D4D4D', }}>
+                        <DepositModal accounts={accounts} wrapSetShow={wrapSetShowDeposit} id={proposal.length > 0 && proposal[0].id || 0} />
                     </Modal.Body>
                 </Modal>
             </>

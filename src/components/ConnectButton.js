@@ -1,43 +1,44 @@
 import "@fontsource/merriweather"
-import { ArrowRightOutlined } from '@ant-design/icons'
+import { IoWalletOutline } from "react-icons/io5";
 
 const style = {
     button: {
-        backgroundColor: 'transparent',
-        border: 'none'
+        backgroundImage: 'Linear-Gradient(#2eff66 0%, #5956fc 100%)',
+        border: 'solid 2px #5dfc8a',
+        padding: '1em 1em 1em 1em',
+        borderRadius: '10px',
+        width: '100%'
     },
     buttonText: {
-        fontSize: '24px',
-        color: '#27e35c',
-        fontFamily: 'Roboto'
+        fontSize: '16px',
+        fontWeight: '700 bold',
+        color: '#ffffff',
+        fontFamily: 'montserrat'
     }
 }
 
 const ConnectButton = ({ wrapSetShow }) => {
 
-    const handleOver = (e) => {
-        e.target.style.transform = 'translate(0, -5px)'
+    const handleEnter = (e) => {
+        e.target.style.backgroundImage = 'Linear-Gradient(263.6deg, #4D4D4D 0%, #000000 100%)'
+        e.target.style.border = 'solid 2px #5dfc8a'
     }
 
     const handleLeave = (e) => {
-        e.target.style.transform = 'translate(0, 0)'
+        e.target.style.backgroundImage = 'Linear-Gradient(#2eff66 0%, #5956fc 100%)'
     }
 
     return (
         <div style={style.buttonText}>
-            <button 
+            <button
                 style={style.button}
                 onClick={async () => {
                     await wrapSetShow(true)
-                }}>
-                Connect
-                <span style={{
-                    paddingBottom: '20px'
-                }}>
-                    <ArrowRightOutlined style={{
-                        marginLeft: '10px'
-                    }}/>
-                </span>
+                }} onMouseOver={handleEnter} onMouseLeave={handleLeave}>
+                    <IoWalletOutline style={{
+                        marginRight: '10px'
+                    }} />
+                Connect Wallet
             </button>
         </div>
     )

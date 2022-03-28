@@ -1,10 +1,7 @@
-import { message, notification, Checkbox, InputNumber} from "antd"
+import { notification, Checkbox, InputNumber} from "antd"
 import { withDraw } from "../helpers/transaction"
 import { getKeplr, getStargateClient } from "../helpers/getKeplr"
-import { makeSignDocWithDrawMsg, makeWithDrawMsg } from "../helpers/ethereum/lib/eth-transaction/Msg"
-import { broadcastTransaction } from "../helpers/ethereum/lib/eth-broadcast/broadcastTX"
-import { getWeb3Instance } from "../helpers/ethereum/lib/metamaskHelpers"
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import ClipLoader from "react-spinners/ClipLoader"
 
 const style = {
@@ -41,7 +38,7 @@ const style = {
         borderRadius: '10px',
     },
     formTitle: {
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         color: '#ffffff',
         fontWeight: 500
     }
@@ -100,38 +97,6 @@ const WithDrawModal = ({ address, type, validator, wrapSetShow }) => {
                 })
             }
         }
-        else {
-            //makeSignDocDelegateMsg, makeDelegateMsgmakeDelegateMsg
-            // please set enviroment variable: DENOM, etc
-            //import web3
-            let web3 = await getWeb3Instance();
-            const denom = process.env.REACT_APP_DENOM
-            const chainId = process.env.REACT_APP_CHAIN_ID
-            const memo = "Love From Dev Team"
-
-            console.log(address)
-            const gasLimit = parseInt(gasAmount)
-
-
-            const msgWithDraw = makeWithDrawMsg(address, validator, denom)
-            const makeSignDocWithDrawelMsg = makeSignDocWithDrawMsg(address, validator, denom)
-
-            const UIProcessing = function(){
-                setIsDoingTx(false)
-                wrapSetShow(false)
-            }
-
-            broadcastTransaction(address, msgWithDraw, makeSignDocWithDrawelMsg, chainId, memo, gasLimit, web3, UIProcessing).then(() => {
-                // setIsDoingTx(false)
-                // wrapSetShow(false)
-                // success()
-            }).catch((e) => {
-                setIsDoingTx(false)
-                wrapSetShow(false)
-                error(e.message)
-            })
-
-        }
     }
 
     return (
@@ -154,7 +119,7 @@ const WithDrawModal = ({ address, type, validator, wrapSetShow }) => {
                 </div>
             </div>
             <div>
-                <Checkbox onChange={check} style={{color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'Roboto' }}>Advance</Checkbox>
+                <Checkbox onChange={check} style={{color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'montserrat' }}>Advance</Checkbox>
             </div>
             {
                 showAdvance && (
@@ -225,7 +190,7 @@ const WithDrawModal = ({ address, type, validator, wrapSetShow }) => {
                         fontSize: '15px',
                         backgroundColor: '#C4C4C4',
                         color: '#ffffff',
-                        fontFamily: 'Roboto',
+                        fontFamily: 'montserrat',
                         marginRight: '20px'
                     }}>
                     Cancel
@@ -238,9 +203,9 @@ const WithDrawModal = ({ address, type, validator, wrapSetShow }) => {
                         width: '20%',
                         height: '2.5rem',
                         fontSize: '15px',
-                        backgroundColor: '#67d686',
+                        backgroundColor: 'rgb(103, 214, 134)',
                         color: '#ffffff',
-                        fontFamily: 'Roboto'
+                        fontFamily: 'montserrat'
                     }}>
                     Withdraw
                 </button>

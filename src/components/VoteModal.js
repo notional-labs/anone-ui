@@ -1,22 +1,15 @@
 import { InputNumber, notification, Checkbox, Radio } from "antd"
-import { vote} from "../helpers/transaction"
+import { voteTest } from "../helpers/transaction"
 import { useEffect, useState } from 'react'
 import { Form } from "react-bootstrap";
-import { getKeplr, getStargateClient } from "../helpers/getKeplr";
-import { makeVoteMsg ,makeSignDocVoteMsg } from "../helpers/ethereum/lib/eth-transaction/Msg"
-import { broadcastTransaction } from "../helpers/ethereum/lib/eth-broadcast/broadcastTX"
-import { getWeb3Instance } from "../helpers/ethereum/lib/metamaskHelpers";
+import { getClient } from "../helpers/getKeplr";
 import ClipLoader from "react-spinners/ClipLoader"
 
 const style = {
     transfer: {
         marginBottom: '2rem',
         width: '100%',
-        marginTop: '1rem',
-        padding: 20,
-        backgroundColor: '#1f1f1f',
-        borderRadius: '20px',
-        border: 'solid 1px #bdbdbd'
+        backgroundColor: '#4D4D4D'
     },
     transferInfo: {
         padding: '50px',
@@ -41,8 +34,8 @@ const style = {
         marginBottom: '1rem'
     },
     formInput: {
-        backgroundColor: '#1f1f1f',
-        color: '#bdbdbd',
+        backgroundColor: '#4D4D4D',
+        color: '#ffffff',
         borderRadius: '10px',
     },
     formTitle: {
@@ -52,7 +45,7 @@ const style = {
     }
 }
 
-const VoteModal = ({ proposal, wrapSetShow }) => {
+const VoteModal = ({ proposal, id, wrapSetShow }) => {
     const [fee, setFee] = useState('5000')
     const [voters, setVoters] = useState([])
     const [selectVoter, setSelectVoter] = useState(0)
@@ -110,12 +103,10 @@ const VoteModal = ({ proposal, wrapSetShow }) => {
     const handleClick = async () => {
         setIsDoingTx(true)
         if (voters[selectVoter].type === 'keplr') {
-            const { offlineSigner } = await getKeplr();
-
-            const stargate = await getStargateClient(offlineSigner)
-            if (stargate != null) {
+            const newStargate = await getClient()
+            if (newStargate != null) {
                 const gas = parseInt(gasAmount)
-                vote(stargate, choice, `${proposal.id}`, voters[selectVoter].account.address, gas).then(() => {
+                voteTest(newStargate, choice, `${id}`, voters[selectVoter].account.address, gas).then(() => {
                     setIsDoingTx(false)
                     success()
                     wrapSetShow(false)
@@ -126,37 +117,6 @@ const VoteModal = ({ proposal, wrapSetShow }) => {
                     console.log(e)
                 })
             }
-        }
-        else {
-            //makeSignDocDelegateMsg, makeDelegateMsg
-            // please set enviroment variable: DENOM, etc
-            //import web3
-            let web3 = await getWeb3Instance();
-            const denom = process.env.REACT_APP_DENOM
-            const chainId = process.env.REACT_APP_CHAIN_ID
-            const memo = "Love From Dev Team"
-
-            const address = voters[selectVoter].account
-            const gasLimit = parseInt(gasAmount)
-
-            const msgVote = makeVoteMsg(choice, `${proposal.id}`, voters[selectVoter].account.address, denom)
-            const signDocVote = makeSignDocVoteMsg(choice, `${proposal.id}`, voters[selectVoter].account.address, denom)
-
-            console.log("address", address)
-
-            const UIProcessing = function () {
-                setIsDoingTx(false)
-                wrapSetShow(false)
-            }
-            broadcastTransaction(address, msgVote, signDocVote, chainId, memo, gasLimit, web3, UIProcessing).then(() => {
-                // wrapSetShow(false)
-                // setIsDoingTx(false)
-                // success()
-            }).catch((e) => {
-                wrapSetShow(false)
-                setIsDoingTx(false)
-                error(e.message)
-            })
         }
     }
 
@@ -181,10 +141,10 @@ const VoteModal = ({ proposal, wrapSetShow }) => {
                     value={choice}
                     style={style.formInput}
                 >
-                    <Radio value={1} style={{color: '#bdbdbd', backgroundColor: '#1f1f1f'}}>Yes</Radio>
-                    <Radio value={3} style={{color: '#bdbdbd',}}>No</Radio>
-                    <Radio value={4} style={{color: '#bdbdbd',}}>No With Veto</Radio>
-                    <Radio value={2} style={{color: '#bdbdbd',}}>Abstain</Radio>
+                    <Radio value={1} style={{color: '#ffffff', backgroundColor: '#4D4D4D'}}>Yes</Radio>
+                    <Radio value={3} style={{color: '#ffffff',}}>No</Radio>
+                    <Radio value={4} style={{color: '#ffffff',}}>No With Veto</Radio>
+                    <Radio value={2} style={{color: '#ffffff',}}>Abstain</Radio>
                 </Radio.Group>
             </div >
             {/* <div style={style.transfer}>
@@ -197,7 +157,7 @@ const VoteModal = ({ proposal, wrapSetShow }) => {
                         border: `2px solid #c4c4c4`,
                         fontSize: '1rem',
                         paddingTop: '0.2rem',
-                        backgroundColor: '#1f1f1f',
+                        backgroundColor: '#4D4D4D',
                         color: '#F6F3FB'
                     }} min={0} step={1} onChange={handleChangeFee} defaultValue={parseInt(fee)} />
                 </>
@@ -209,18 +169,51 @@ const VoteModal = ({ proposal, wrapSetShow }) => {
                 showAdvance && (
                     <div style={style.transfer}>
                         <div style={{ marginBottom: '1rem', ...style.formTitle }}>Set Gas</div>
-                        <>
+                        <div style={{
+                            width: '100%',
+                            height: '40px',
+                            borderRadius: '10px',
+                            border: `2px solid #c4c4c4`,
+                            fontSize: '1rem',
+                            padding: 0,
+                            backgroundColor: '#4D4D4D',
+                            color: '#F6F3FB'
+                        }}>
                             <InputNumber style={{
-                                width: '100%',
-                                height: '40px',
-                                borderRadius: '10px',
-                                border: `2px solid #c4c4c4`,
+                                width: '80%',
+                                height: '100%',
                                 fontSize: '1rem',
                                 paddingTop: '0.2rem',
-                                backgroundColor: '#1f1f1f',
-                                color: '#F6F3FB'
-                            }} min={0} step={1} onChange={handleChangeGas} defaultValue={parseInt(gasAmount)} />
-                        </>
+                                backgroundColor: '#4D4D4D',
+                                color: '#F6F3FB',
+                                borderRadius: '10px 0 0 10px'
+                            }} min={0}
+                                step={1}
+                                onChange={handleChangeGas}
+                                defaultValue={parseInt(gasAmount)}
+                                controls={false}
+                                bordered={false}
+                            />
+                            <span style={{
+                                height: '40px',
+                                borderRadius: '10px',
+                                border: `none`,
+                                fontSize: '1.3rem',
+                            }}>
+                                |
+                            </span>
+                            <span style={{
+                                width: '20%',
+                                height: '100%',
+                                borderRadius: '10px',
+                                border: `none`,
+                                fontSize: '1rem',
+                                textAlign: 'center',
+                                marginLeft: '2em'
+                            }}>
+                                UAN1
+                            </span>
+                        </div>
                     </div>
                 )
             }
@@ -232,11 +225,33 @@ const VoteModal = ({ proposal, wrapSetShow }) => {
                 )
             }
             <div style={style.button}>
-                <button onClick={() => wrapSetShow(false)} style={{ border: 0, borderRadius: '10px', width: '20%', height: '2.5rem', fontSize: '1rem', backgroundColor: '#838089', color: '#F6F3FB', fontFamily: 'ubuntu', marginRight: '20px' }}>
+                <button onClick={() => wrapSetShow(false)}
+                    style={{
+                        border: 0,
+                        borderRadius: '10px',
+                        width: '20%',
+                        height: '2.5rem',
+                        fontSize: '15px',
+                        backgroundColor: '#C4C4C4',
+                        color: '#ffffff',
+                        fontFamily: 'montserrat',
+                        marginRight: '20px'
+                    }}>
                     Cancel
                 </button>
-                <button disabled={checkDisable()} onClick={handleClick} style={{ border: 0, borderRadius: '10px', width: '20%', height: '2.5rem', fontSize: '1rem', backgroundColor: '#ffac38', color: '#F6F3FB', fontFamily: 'ubuntu' }}>
-                    Vote
+                <button disabled={checkDisable()}
+                    onClick={handleClick}
+                    style={{
+                        border: 0,
+                        borderRadius: '10px',
+                        width: '20%',
+                        height: '2.5rem',
+                        fontSize: '15px',
+                        backgroundColor: 'rgb(103, 214, 134)',
+                        color: '#ffffff',
+                        fontFamily: 'montserrat'
+                    }}>
+                    Send
                 </button>
             </div>
         </div >

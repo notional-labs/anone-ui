@@ -5,11 +5,8 @@ axiosRetry(axios, { retries: 3 });
 
 export const getValidators = async (logoDisableFlag) => {
     const api = process.env.REACT_APP_API
-    const URL = `${api}staking/validators`
-    console.log(URL)
-    const res = await axios.get(URL)
+    const res = await axios.get(`${api}staking/validators`)
 
-    // const res = await axios.get('https://api-1-dig.notional.ventures/staking/validators')
     if (res.status === 200) {
         let validators = res.data.result
         if (!logoDisableFlag) {

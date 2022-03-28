@@ -49,7 +49,7 @@ const Profile = ({ account }) => {
                     <div style={{ marginBottom: '2rem', border: 'solid 1px black', borderRadius: '20px', padding: '20px', marginTop: '1rem' }}>
                         <Title style={{ color: '#2a3158', marginRight: '21rem', fontFamily: 'Merriweather', marginTop: '1rem' }} level={4}>Amount</Title>
                         <div style={{ border: 'solid 1px black', backgroundColor: '#ffffff', padding: 10, borderRadius: '50px', marginTop: '10px', color: '#2a3158', height: '50%', fontSize: '2rem' }}>
-                            {parseInt(account.amount) / 1000000} DIG
+                            {parseInt(account.amount) / 1000000} AN1
                         </div>
                     </div>
                 </div>

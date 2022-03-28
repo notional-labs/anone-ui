@@ -1,19 +1,14 @@
-import { Image } from "antd"
-import digger from '../assets/img/digger.png'
-import coin1 from '../assets/img/coin1.png'
-import coin2 from '../assets/img/coin2.png'
-import coin3 from '../assets/img/coin3.png'
+import aos from "aos"
+import { useEffect } from "react"
 
 const style = {
     intro: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: 140,
-        paddingTop: 20,
-        paddingBottom: 20,
+        padding: 20,
         height: 'auto',
-        minHeight: '70vh'
+        minHeight: '80vh'
     },
     asset: {
         position: 'absolute',
@@ -22,31 +17,38 @@ const style = {
 }
 
 const FrontPage = () => {
+
+    useEffect(() => {
+        aos.init({
+            duration: 3000
+        })
+    }, [])
+
     return (
-        <div style={{
-            paddingTop: 10
-        }}>
+        <div>
             <div style={style.intro}>
                 <div style={{
-                    textAlign: 'left',
-                    width: '40%'
+                    textAlign: 'center',
+                    margin: 'auto'
                 }}>
-                    <p style={{
-                        color: '#27e35c',
-                        fontSize: '100px',
-                        fontWeight: 700,
-                        margin: 0,
-                        height: '100px'
-                    }}>
+                    {/* <div data-aos="zoom-in">
+                        <Image
+                            width={500}
+                            src={digger}
+                            preview={false}
+                        />
+                    </div> */}
+                    <p
+                        data-aos="zoom-in"
+                        style={{
+                            color: '#5dfc8a',
+                            fontSize: '100px',
+                            fontWeight: 700,
+                            margin: 0,
+                            height: '100px',
+                            marginBottom: '50px'
+                        }}>
                         ANONE
-                    </p>
-                    <p style={{
-                        color: '#FFFFFF',
-                        fontSize: '100px',
-                        fontWeight: 700,
-                        margin: 0
-                    }}>
-                        your coin
                     </p>
                     <p style={{
                         color: '#FFFFFF',
@@ -64,12 +66,12 @@ const FrontPage = () => {
                     }}>
                         Let have a kick around the comunity and the validators.
                     </p>
-                    
-                    <a href="https://digchain.org/" target={'_blank'}>
+
+                    <a href="https://anone-testnet.notional.ventures/" target={'_blank'}>
                         <button style={{
                             border: 0,
                             borderRadius: '10px',
-                            backgroundColor: '#27e35c',
+                            backgroundColor: '#5dfc8a',
                             color: '#ffffff',
                             fontSize: '24px',
                             padding: 30,
@@ -81,71 +83,7 @@ const FrontPage = () => {
                         </button>
                     </a>
                 </div>
-                {/* <div>
-                    <Image
-                        width={500}
-                        src={digger}
-                        preview={false}
-                    />
-                </div> */}
             </div>
-            {/* <div style={{
-                ...style.asset,
-                top: '200px',
-                left: '800px',
-                transform: 'rotate(120deg)'
-            }}>
-                <Image
-                    width={150}
-                    src={coin1}
-                    preview={false}
-                />
-            </div>
-            <div style={{
-                ...style.asset,
-                top: '700px',
-                left: '500px',
-                transform: 'rotate(120deg)'
-            }}>
-                <Image
-                    width={80}
-                    src={coin1}
-                    preview={false}
-                />
-            </div>
-            <div style={{
-                ...style.asset,
-                top: '750px',
-                left: '600px',
-            }}>
-                <Image
-                    width={150}
-                    src={coin1}
-                    preview={false}
-                />
-            </div>
-            <div style={{
-                ...style.asset,
-                top: '600px',
-                left: '1000px',
-            }}>
-                <Image
-                    width={300}
-                    src={coin2}
-                    preview={false}
-                />
-            </div>
-            <div style={{
-                ...style.asset,
-                top: '620px',
-                left: '1600px',
-            }}>
-                <Image
-                    width={150}
-                    src={coin3}
-                    preview={false}
-                />
-            </div> */}
 
         </div >
     )

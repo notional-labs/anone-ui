@@ -261,7 +261,7 @@ const IBCTransferModal = ({ account, wrapSetShow }) => {
                         <div style={style.transfer}>
                             <p style={style.formTitle}>Amount Availabe</p>
                             <p style={{ ...style.formInput, border: 'solid 1px #bdbdbd', padding: 10 }}>
-                                {parseInt(amount) / 1000000 || 0} DIG
+                                {parseInt(amount) / 1000000 || 0} AN1
                             </p>
                             <div style={{ marginBottom: '1rem', ...style.formTitle }}>Amount To Send</div>
                             <>

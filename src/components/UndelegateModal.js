@@ -1,11 +1,7 @@
-import { InputNumber, message, notification, Checkbox } from "antd"
+import { InputNumber, notification, Checkbox } from "antd"
 import { unbonding } from "../helpers/transaction"
-import { useEffect, useState } from 'react'
-import { Form } from "react-bootstrap";
+import { useState } from 'react'
 import { getKeplr, getStargateClient } from "../helpers/getKeplr";
-import { makeMsgBeginRedelegate, makeSignDocDelegateMsg, makeDelegateMsg, makeUndelegateMsg, makeSignDocUnDelegateMsg } from "../helpers/ethereum/lib/eth-transaction/Msg"
-import { broadcastTransaction } from "../helpers/ethereum/lib/eth-broadcast/broadcastTX"
-import { getWeb3Instance } from "../helpers/ethereum/lib/metamaskHelpers";
 import ClipLoader from "react-spinners/ClipLoader"
 
 const style = {
@@ -41,7 +37,7 @@ const style = {
         borderRadius: '10px',
     },
     formTitle: {
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         color: '#ffffff',
         fontWeight: 500
     }
@@ -115,39 +111,6 @@ const UndelegateModal = ({ address, type, delegation, wrapSetShow }) => {
                     console.log(e)
                 })
             }
-        }
-        else {
-            //makeSignDocDelegateMsg, makeDelegateMsg
-            // please set enviroment variable: DENOM, etc
-            //import web3
-            let web3 = await getWeb3Instance();
-            const denom = process.env.REACT_APP_DENOM
-            const chainId = process.env.REACT_APP_CHAIN_ID
-            const memo = "Love From Dev Team"
-
-            const gasLimit = parseInt(gasAmount)
-
-
-            const val = delegation.delegation.validator_address
-            const amount = value * 1000000
-
-            const msgDelegate = makeUndelegateMsg(address, val, amount, denom)
-            const signDocDelegate = makeSignDocUnDelegateMsg(address, val, amount, denom)
-            const UIProcessing = function () {
-                setIsDoingTx(false)
-                wrapSetShow(false)
-                success()
-            }
-
-            broadcastTransaction(address, msgDelegate, signDocDelegate, chainId, memo, gasLimit, web3, UIProcessing).then(() => {
-                // setIsDoingTx(false)
-                // wrapSetShow(false)
-                // success()
-            }).catch((e) => {
-                setIsDoingTx(false)
-                wrapSetShow(false)
-                error(e.message)
-            })
         }
     }
 
@@ -234,7 +197,7 @@ const UndelegateModal = ({ address, type, delegation, wrapSetShow }) => {
                 </div>
             </div>
             <div>
-                <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'Roboto' }}>Advance</Checkbox>
+                <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'montserrat' }}>Advance</Checkbox>
             </div>
             {
                 showAdvance && (
@@ -305,7 +268,7 @@ const UndelegateModal = ({ address, type, delegation, wrapSetShow }) => {
                         fontSize: '15px',
                         backgroundColor: '#C4C4C4',
                         color: '#ffffff',
-                        fontFamily: 'Roboto',
+                        fontFamily: 'montserrat',
                         marginRight: '20px'
                     }}>
                     Cancel
@@ -318,9 +281,9 @@ const UndelegateModal = ({ address, type, delegation, wrapSetShow }) => {
                         width: '20%',
                         height: '2.5rem',
                         fontSize: '15px',
-                        backgroundColor: '#67d686',
+                        backgroundColor: 'rgb(103, 214, 134)',
                         color: '#ffffff',
-                        fontFamily: 'Roboto'
+                        fontFamily: 'montserrat'
                     }}>
                     Send
                 </button>

@@ -1,10 +1,6 @@
-import assert from 'assert'
 import axios from 'axios'
-import { delegate, unbonding } from './transaction'
 
 const api = process.env.REACT_APP_API
-// const api = "http://0.0.0.0:1317"
-// const api = "https://api-1-dig.notional.ventures"
 
 export const getBalance = async (address) => {
     const URL = `${api}/bank/balances/${address}`
@@ -74,10 +70,10 @@ export const getTotalUnbonding = (unbondings) => {
 }
 
 export const getPrice = async () => {
-    const URL = 'https://api.coingecko.com/api/v3/simple/price?ids=dig-chain&vs_currencies=usd'
-    const res = await axios.get(URL)
-    if(res.status !== 200) return
-    return res.data
+    // const URL = 'https://api.coingecko.com/api/v3/simple/price?ids=dig-chain&vs_currencies=usd'
+    // const res = await axios.get(URL)
+    // if(res.status !== 200) return
+    return 0
 }
 
 export const convertAsset = (balance, delegation, reward, unbond, usd) => {

@@ -2,9 +2,11 @@ import ProposalCard from "../components/ProposalCard"
 import { Modal, } from 'react-bootstrap'
 import VoteModal from "../components/VoteModal"
 import { useCallback, useEffect, useState } from "react"
-import { getProposals, } from "../helpers/getProposal"
+import { getProposals, getBond } from "../helpers/getProposal"
 import '../assets/css/ProposalList.css'
-import { Link } from "react-router-dom"
+import { Skeleton } from "antd"
+import CreateProposalModal from "../components/CreateProposalModal"
+import DepositModal from "../components/DepositModal"
 
 const style = {
     container: {
@@ -13,8 +15,8 @@ const style = {
         justifyContent: 'center',
         textAlign: 'center',
         paddingBottom: '20px',
-        padding: 140,
-        paddingTop: 0
+        padding: 70,
+        paddingTop: '7em'
     },
     button: {
         marginTop: '3rem',
@@ -25,22 +27,37 @@ const style = {
         fontWeight: 700,
         fontSize: '24px',
         color: '#ffffff',
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         paddingBottom: '0.5em'
+    },
+    card: {
+        borderRadius: '15px',
+        minHeight: 'auto',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)'
     },
 }
 
-const ProposalList = () => {
+const ProposalList = ({ accounts }) => {
     const [show, setShow] = useState(false)
     const [proposals, setProposals] = useState([])
     const [selectProposal, setSelectProposal] = useState(-1)
+    const [loading, setLoading] = useState(false)
+    const [showCreateProposal, setShowCreateProposal] = useState(false)
+    const [showDeposit, setShowDeposit] = useState(false)
+    const [bond, setBond] = useState(0)
 
     useEffect(() => {
         (async () => {
+            setLoading(true)
             const res = await getProposals()
             const proposals = res.proposals
+            const bondRes = await getBond()
+            const bondToken = bondRes.result.bonded_tokens || 0
             proposals.sort((x, y) => y.proposal_id - x.proposal_id)
             setProposals([...proposals])
+            setBond(parseInt(bondToken))
+            setLoading(false)
         })()
     }, [])
 
@@ -56,47 +73,140 @@ const ProposalList = () => {
         setShow(false)
     }
 
+    const handleCloseCreateProposal = () => {
+        setShowCreateProposal(false)
+    }
+
+    const handleClick = () => {
+        setShowCreateProposal(true)
+    }
+
+    const wrapSetShowCreateProposal = useCallback((val) => {
+        setShowCreateProposal(val)
+    }, [setShowCreateProposal])
+
+    const wrapSetShowDeposit = useCallback((val) => {
+        setShowDeposit(val)
+    }, [setShowDeposit])
+
+    const handleEnter = (e) => {
+        e.target.style.backgroundImage = 'Linear-Gradient(263.6deg, #4D4D4D 0%, #000000 100%)'
+        e.target.style.border = 'solid 2px #5dfc8a'
+    }
+
+    const handleLeave = (e) => {
+        e.target.style.backgroundImage = 'Linear-Gradient(#2eff66 0%, #5956fc 100%)'
+    }
+
     return (
         <div style={style.container}>
-            <div style={style.breadcrumb}>
-                <span>
-                    <Link to='/' style={{ color: '#ffffff', fontWeight: 500 }}>
-                        Homepage
-                    </Link>
-                </span>
-                <span style={{ color: '#ffffff', fontWeight: 500 }}>
-                    {' / '}
-                </span>
-                <span style={{ color: '#16ab40' }}>
-                    Proposals
-                </span>
-            </div>
             <div style={{
+                display: 'flex',
+                justifyContent: 'space-between'
+            }}>
+                <div style={{
                     textAlign: 'left',
-                    fontSize: '48px',
+                    fontSize: '36px',
                     color: '#ffffff',
-                    fontFamily: 'Roboto',
-                    fontWeight: 700,
-                    marginBottom: '1.3em'
+                    fontFamily: 'montserrat',
+                    fontWeight: 'bold',
+                    marginBottom: '50px'
                 }}>
                     PROPOSALS
                 </div>
-            {proposals.length > 0 &&
+                <div>
+                    <button
+                        onClick={handleClick}
+                        style={{
+                            backgroundImage: 'Linear-Gradient(#2eff66 0%, #5956fc 100%)',
+                            border: 'solid 2px #5dfc8a',
+                            color: '#ffffff',
+                            fontWeight: 700,
+                            fontSize: '24px',
+                            padding: '10px 20px 10px 20px',
+                            borderRadius: '10px'
+                        }} onMouseOver={handleEnter} onMouseLeave={handleLeave}>
+                        Create Proposal
+                    </button>
+                </div>
+            </div>
+            {loading && proposals.length === 0 ? (
+                <div style={style.card}>
+                    <Skeleton active style={{
+                        backgroundColor: '#ffffff',
+                        padding: '30px',
+                        borderRadius: '15px'
+                    }} />
+                </div>
+            ) : (
                 <div className="gridBox">
                     {(proposals.map((proposal, index) => (
-                        <ProposalCard proposal={proposal} wrapSetShow={wrapSetShow} wrapSetSelect={wrapSetSelect} index={index} />
+                        <ProposalCard
+                            proposal={proposal}
+                            wrapSetShow={wrapSetShow}
+                            wrapSetSelect={wrapSetSelect}
+                            wrapSetShowDeposit={wrapSetShowDeposit}
+                            index={index}
+                            bond={bond}
+                        />
                     )))}
                 </div>
+            )
             }
             <>
                 <Modal show={show} onHide={handleClose} backdrop="static" >
-                    <Modal.Header style={{ backgroundColor: '#d6d6d6', color: '#696969', fontFamily: 'ubuntu', fontSize: '1.2rem', fontWeight: 600 }}>
+                    <Modal.Header style={{
+                        backgroundColor: '#4D4D4D',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        border: 0
+                    }}>
                         <div>
                             Vote
                         </div>
                     </Modal.Header>
-                    <Modal.Body style={{ backgroundColor: '#1f1f1f', }}>
-                        <VoteModal proposal={proposals[selectProposal]} wrapSetShow={wrapSetShow} />
+                    <Modal.Body style={{ backgroundColor: '#4D4D4D', }}>
+                        <VoteModal proposal={proposals[selectProposal]} id={proposals[selectProposal] && proposals[selectProposal].proposal_id} wrapSetShow={wrapSetShow} />
+                    </Modal.Body>
+                </Modal>
+            </>
+            <>
+                <Modal show={showDeposit} onHide={handleClose} backdrop="static" >
+                    <Modal.Header style={{
+                        backgroundColor: '#4D4D4D',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        border: 0
+                    }}>
+                        <div>
+                            Deposit
+                        </div>
+                    </Modal.Header>
+                    <Modal.Body style={{ backgroundColor: '#4D4D4D', }}>
+                        <DepositModal accounts={accounts} wrapSetShow={wrapSetShowDeposit} id={proposals[selectProposal] && proposals[selectProposal].proposal_id} />
+                    </Modal.Body>
+                </Modal>
+            </>
+            <>
+                <Modal show={showCreateProposal} onHide={handleCloseCreateProposal} backdrop="static" >
+                    <Modal.Header style={{
+                        backgroundColor: '#4D4D4D',
+                        color: '#5dfc8a',
+                        fontFamily: 'montserrat',
+                        fontSize: '24px',
+                        fontWeight: 400,
+                        border: 0
+                    }}>
+                        <div>
+                            Create Proposal
+                        </div>
+                    </Modal.Header>
+                    <Modal.Body style={{ backgroundColor: '#4D4D4D', }}>
+                        <CreateProposalModal accounts={accounts} wrapSetShow={wrapSetShowCreateProposal} />
                     </Modal.Body>
                 </Modal>
             </>

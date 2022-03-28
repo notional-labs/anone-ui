@@ -1,11 +1,8 @@
-import { InputNumber, message, notification, Checkbox } from "antd"
+import { InputNumber, notification, Checkbox } from "antd"
 import { delegate } from "../helpers/transaction"
 import { useEffect, useState } from 'react'
 import { Form } from "react-bootstrap";
 import { getKeplr, getStargateClient } from "../helpers/getKeplr";
-import { makeMsgBeginRedelegate, makeSignDocDelegateMsg, makeDelegateMsg, makeSendMsg, makeSignDocSendMsg, makeSendMsgcTemp } from "../helpers/ethereum/lib/eth-transaction/Msg"
-import { broadcastTransaction } from "../helpers/ethereum/lib/eth-broadcast/broadcastTX"
-import { getWeb3Instance } from "../helpers/ethereum/lib/metamaskHelpers";
 import ClipLoader from "react-spinners/ClipLoader"
 import { getBalance } from "../helpers/getBalances";
 
@@ -44,7 +41,7 @@ const style = {
         marginBottom: 10
     },
     formTitle: {
-        fontFamily: 'Roboto',
+        fontFamily: 'montserrat',
         color: '#ffffff',
         fontWeight: 400,
         fontSize: '15px'
@@ -124,6 +121,7 @@ const DelegateModal = ({ validators, wrapSetter, defaultVal }) => {
             const { offlineSigner } = await getKeplr();
 
             const stargate = await getStargateClient(offlineSigner)
+            console.log(stargate)
             if (stargate != null) {
                 const amount = value * 1000000
                 const recipient = validators[selectVal].operator_address
@@ -217,7 +215,7 @@ const DelegateModal = ({ validators, wrapSetter, defaultVal }) => {
                 </div>
             </div>
             <div>
-                <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'Roboto' }}>Advance</Checkbox>
+                <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'montserrat' }}>Advance</Checkbox>
             </div>
             {
                 showAdvance && (
@@ -288,7 +286,7 @@ const DelegateModal = ({ validators, wrapSetter, defaultVal }) => {
                         fontSize: '15px',
                         backgroundColor: '#C4C4C4',
                         color: '#ffffff',
-                        fontFamily: 'Roboto',
+                        fontFamily: 'montserrat',
                         marginRight: '20px'
                     }}>
                     Cancel
@@ -301,9 +299,9 @@ const DelegateModal = ({ validators, wrapSetter, defaultVal }) => {
                         width: '20%',
                         height: '2.5rem',
                         fontSize: '15px',
-                        backgroundColor: '#67d686',
+                        backgroundColor: 'rgb(103, 214, 134)',
                         color: '#ffffff',
-                        fontFamily: 'Roboto'
+                        fontFamily: 'montserrat'
                     }}>
                     Send
                 </button>

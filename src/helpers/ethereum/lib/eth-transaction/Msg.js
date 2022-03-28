@@ -1,5 +1,7 @@
 import { coins, coin } from "@cosmjs/launchpad";
 
+const gov_1 = require("cosmjs-types/cosmos/gov/v1beta1/gov");
+
 
 export function makeSendMsg(fromAddress, toAddress, amount, denom) {
     const msgSend = {
@@ -72,7 +74,7 @@ export function makeBeginRedelegateMsg(delegatorAddress, validatorSrcAddress, va
 export const makeVoteMsg = (option, proposal_id, voter) => {
     const msgVote = {
         option: option,
-        proposal_id: proposal_id,
+        proposalId: proposal_id,
         voter: voter
     }
 
@@ -80,6 +82,43 @@ export const makeVoteMsg = (option, proposal_id, voter) => {
         typeUrl: "/cosmos.gov.v1beta1.MsgVote",
         value: msgVote,
     }
+    return msg
+}
+
+export const makeSubmitProposalMsg = (title, description, deposit, proposer, denom) => {
+
+    const msgSubmitProposal = {
+        content: {
+            typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+            value: gov_1.TextProposal.encode(gov_1.TextProposal.fromPartial({
+                title: title,
+                description: description,
+            })).finish(),
+        },
+        initialDeposit: [coin(deposit, denom)],
+        proposer: proposer
+    }
+
+    const msg = {
+        typeUrl: "/cosmos.gov.v1beta1.MsgSubmitProposal",
+        value: msgSubmitProposal,
+    }
+    return msg
+}
+
+export const makeDepositMsg = (amount, depositor, proposal_id, denom) => {
+
+    const msgDeposit = {
+        amount: [coin(amount, denom)],
+        depositor: depositor,
+        proposalId: proposal_id
+    }
+
+    const msg = {
+        typeUrl: '/cosmos.gov.v1beta1.MsgDeposit',
+        value: msgDeposit
+    }
+
     return msg
 }
 
@@ -156,4 +195,33 @@ export const makeSignDocVoteMsg = (option, proposal_id, voter) => {
         }
     }
     return signDocVote
+}
+
+export const makeSignDocSubmitProposalMsg = (title, description, deposit, proposer, denom) => {
+    const signDocSubmitProposal = {
+        type: "cosmos-sdk/MsgSubmitProposal",
+        value: {
+            content: {
+                type: 'cosmos-sdk/TextProposal',
+                value: gov_1.TextProposal.encode(gov_1.TextProposal.fromPartial({
+                    title: title,
+                    description: description,
+                })).finish(),
+            },
+            initial_deposit: [coin(deposit, denom)],
+            proposer: proposer
+        }
+    }
+    return signDocSubmitProposal
+}
+
+export const makeSignDocDepositMsg = (amount, depositor, proposal_id, denom) => {
+    const signDocDeposit = {
+        type: 'cosmos-sdk/MsgDeposit',
+        value: {
+            amount: [coin(amount, denom)],
+            depositor: depositor,
+            proposal_id: proposal_id
+        }
+    }
 }

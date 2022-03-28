@@ -1,10 +1,12 @@
-import { InputNumber, notification, Checkbox } from "antd"
-import { useState } from 'react'
+import { InputNumber, notification, Checkbox, Input } from "antd"
+import { useState, useEffect } from 'react'
 import { Form } from "react-bootstrap";
-import { getKeplr, getStargateClient } from "../helpers/getKeplr";
-import { makeBeginRedelegateMsg } from "../helpers/ethereum/lib/eth-transaction/Msg"
+import { getClient } from "../helpers/getKeplr";
+import { submitProposal } from "../helpers/transaction";
 import ClipLoader from "react-spinners/ClipLoader"
+import { getParams } from "../helpers/getProposal";
 
+const { TextArea } = Input;
 
 //TODO: add logic to web, and right variale
 
@@ -47,12 +49,23 @@ const style = {
     }
 }
 
-const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators }) => {
+const CreateProposalModal = ({ accounts, wrapSetShow }) => {
     const [value, setValue] = useState('')
-    const [selectVal, setSelectVal] = useState(0)
+    const [selectProposer, setSelectProposer] = useState(0)
     const [showAdvance, setShowAdvance] = useState(false)
     const [gasAmount, setGasAmount] = useState('400000')
     const [isDoingTX, setIsDoingTx] = useState(false)
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [minAmount, setMinAmount] = useState(0)
+
+    useEffect(() => {
+        (async () => {
+            const params = await getParams()
+            const depositParams = params[0] || 0
+            setMinAmount(parseInt(depositParams.amount))
+        })()
+    }, [])
 
     const success = () => {
         notification.success({
@@ -63,13 +76,21 @@ const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators })
 
     const error = (message) => {
         notification.error({
-            message: 'Redelegate failed',
+            message: 'Submit failed',
             description: message
         })
     };
 
     const handleChange = (value) => {
         setValue(value)
+    }
+
+    const handleChangeTitle = (e) => {
+        setTitle(e.target.value)
+    }
+
+    const handleChangeDescription = (e) => {
+        setDescription(e.target.value)
     }
 
     const checkDisable = () => {
@@ -79,8 +100,8 @@ const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators })
         return false
     }
 
-    const handleChangeSelectVal = (e) => {
-        setSelectVal(e.target.value)
+    const handleChangeSelectProposer = (e) => {
+        setSelectProposer(e.target.value)
     }
 
     const check = (e) => {
@@ -94,100 +115,88 @@ const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators })
 
     const handleClick = async () => {
         setIsDoingTx(true)
-        if (type === 'keplr') {
-            const { offlineSigner } = await getKeplr();
-
-            const stargate = await getStargateClient(offlineSigner)
-            if (stargate != null) {
-                const amount = value * 1000000
-                const val = delegation.delegation.validator_address
-                const validator_src_address = delegation.delegation.validator_address
-                //TODO: add choice form to validator_dst_address - done
-                const validator_dst_address = validators[selectVal].operator_address
-                const gasLimit = parseInt(gasAmount)
-                let stdFee = {
-                    amount: [],
-                    gas: gasLimit.toString(),
-                }
-
-                console.log("address")
-                console.log(validator_src_address)
-                console.log(validator_dst_address)
-                const denom = process.env.REACT_APP_DENOM
-                try {
-                    const msgRelegate = makeBeginRedelegateMsg(address, validator_src_address, validator_dst_address, amount, denom)
-                    await stargate.signAndBroadcast(address, [msgRelegate], stdFee).then(result => {
-                        if (result.code == 0) {
-                            setIsDoingTx(false)
-                            success()
-                            wrapSetShow(false)
-                        } else {
-                            setIsDoingTx(false)
-                            error(result.rawLog)
-                            wrapSetShow(false)
-                        }
-                    })
+        if (accounts[selectProposer].type === 'keplr') {
+            const newStargate = await getClient()
+            if (newStargate != null) {
+                const gas = parseInt(gasAmount)
+                const deposit = parseFloat(value) * 1000000
+                submitProposal(newStargate, title, description, deposit, accounts[selectProposer].account.address, gas).then(() => {
                     setIsDoingTx(false)
-                    wrapSetShow(false)
                     success()
-                }
-                catch (e) {
-                    setIsDoingTx(false)
                     wrapSetShow(false)
+                }).catch((e) => {
+                    setIsDoingTx(false)
                     error(e.message)
-                }
+                    wrapSetShow(false)
+                    console.log(e)
+                })
             }
         }
+
     }
 
     return (
         <div>
             <div style={style.transfer}>
-                <p style={style.formTitle}>Delegator</p>
-                <div style={{
-                    marginBottom: '20px',
-                    width: '100%',
-                    height: '40px',
-                    borderRadius: '10px',
-                    border: `2px solid #c4c4c4`,
-                    fontSize: '1rem',
-                    padding: '0.2rem',
-                    paddingLeft: '0.5rem',
-                    backgroundColor: '#C4C4C4',
-                    color: '#9B9B9B'
-                }}>
-                    {address}
-                </div>
-                <p style={style.formTitle}>Validator</p>
-                <div style={{
-                    marginBottom: '20px',
-                    width: '100%',
-                    height: '40px',
-                    borderRadius: '10px',
-                    border: `2px solid #c4c4c4`,
-                    fontSize: '1rem',
-                    padding: '0.2rem',
-                    paddingLeft: '0.5rem',
-                    backgroundColor: '#C4C4C4',
-                    color: '#9B9B9B'
-                }}>
-                    {delegation.delegation.validator_address}
-                </div>
-            </div>
-            <div style={style.transfer}>
-                <p style={style.formTitle}>To</p>
+                <p style={style.formTitle}>Proposer</p>
                 <>
-                    <Form.Select onChange={handleChangeSelectVal} style={style.formInput}>
+                    <Form.Select onChange={handleChangeSelectProposer} defaultValue={selectProposer} style={style.formInput}>
                         {
-                            validators.map((val, index) => (
-                                <option key={index} value={index}>{val.description.moniker} ({`${val.commission.commission_rates.rate * 100}%`})</option>
+                            accounts.filter(x => x.type === 'keplr').map((account, index) => (
+                                <option key={index} value={index}>{account.type === 'keplr' ? account.account.address : account.account}</option>
                             ))
                         }
                     </Form.Select>
                 </>
+                <p style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'montserrat', marginTop: '1rem' }}>Content</p>
+                <p style={{ ...style.formTitle, marginTop: '20px' }}>Title</p>
+                <div style={{
+                    marginBottom: '20px',
+                    width: '100%',
+                    height: '40px',
+                    borderRadius: '10px',
+                    border: `1px solid #c4c4c4`,
+                    fontSize: '1rem',
+                    backgroundColor: '#C4C4C4',
+                    color: '#9B9B9B',
+                    padding: 0,
+                }}>
+                    <Input placeholder="title"
+                        style={{
+                            height: '100%',
+                            fontSize: '1rem',
+                            paddingTop: '0.2rem',
+                            backgroundColor: '#4D4D4D',
+                            color: '#F6F3FB',
+                            borderRadius: '10px',
+                            border: 'none'
+                        }} onChange={handleChangeTitle}/>
+                </div>
+                <p style={{ ...style.formTitle, marginTop: '20px' }}>Description</p>
+                <div style={{
+                    marginBottom: '20px',
+                    width: '100%',
+                    borderRadius: '10px',
+                    border: `1px solid #c4c4c4`,
+                    fontSize: '1rem',
+                    backgroundColor: '#C4C4C4',
+                    color: '#9B9B9B',
+                    padding: 0,
+                }}>
+                    <TextArea placeholder="description"
+                        style={{
+                            height: '100%',
+                            fontSize: '1rem',
+                            paddingTop: '0.2rem',
+                            backgroundColor: '#4D4D4D',
+                            color: '#F6F3FB',
+                            borderRadius: '10px',
+                            border: 'none'
+                        }} onChange={handleChangeDescription}/>
+                </div>
             </div>
             <div style={style.transfer}>
-                <div style={{ marginBottom: '1rem', ...style.formTitle }}>Amount To Stake</div>
+                <div style={{ marginBottom: '1rem', ...style.formTitle }}>Initial Deposit</div>
                 <div style={{
                     width: '100%',
                     height: '40px',
@@ -206,8 +215,7 @@ const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators })
                         backgroundColor: '#4D4D4D',
                         color: '#F6F3FB',
                         borderRadius: '10px 0 0 10px'
-                    }} min={0}
-                        max={parseFloat(delegation.delegation.shares) / 1000000}
+                    }} 
                         step={0.000001}
                         onChange={handleChange}
                         controls={false}
@@ -234,6 +242,10 @@ const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators })
                     </span>
                 </div>
             </div>
+            <p style={style.formTitle}>Minimal Deposit</p>
+                <p style={{ ...style.formInput, border: 'solid 1px #bdbdbd', padding: 10 }}>
+                    {minAmount / 1000000 || 0} AN1
+                </p>
             <div>
                 <Checkbox onChange={check} style={{ color: '#F6F3FB', fontSize: '1.2rem', fontFamily: 'montserrat' }}>Advance</Checkbox>
             </div>
@@ -330,4 +342,4 @@ const ReDelegateModal = ({ address, type, delegation, wrapSetShow, validators })
     )
 }
 
-export default ReDelegateModal
+export default CreateProposalModal
