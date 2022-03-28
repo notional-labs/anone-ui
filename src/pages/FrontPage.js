@@ -58,11 +58,6 @@ const FrontPage = () => {
                     }}>
                         Welcome to the Another-1 blockchain web 3.0 app. Have a kick around with the wallet and staking features.
                     </p>
-<<<<<<< HEAD
-
-=======
-                    
->>>>>>> 8943229ecd4dc2a2b5bcfe3d6430634787624c2d
                     <a href="https://anone-testnet.notional.ventures/" target={'_blank'}>
                         <button style={{
                             border: 0,
