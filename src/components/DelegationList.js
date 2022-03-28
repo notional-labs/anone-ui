@@ -148,11 +148,11 @@ const DelegationList = ({ address, type, delegations, rewards, }) => {
     return (
         <div>
             <div style={style.container}>
-                <Title style={{ color: '#26ff5c', fontSize: '36px', fontWeight: 'bold', fontFamily: 'montserrat' }}>
+                <Title style={{ color: '#ED9D26', fontSize: '36px', fontWeight: 'bold', fontFamily: 'montserrat' }}>
                     Delegations
                 </Title>
             </div>
-            <div style={{ borderRadius: '10px', border: 'solid 2px #5dfc8a', padding: '1em' }}>
+            <div style={{ borderRadius: '10px', border: 'solid 2px #EEC13F', padding: '1em' }}>
                 <div style={{ width: '8%', float: 'right', marginBottom: '1em' }}>
                     <Link to='/staking'>
                         <button style={style.button}>
