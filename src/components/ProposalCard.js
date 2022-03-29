@@ -63,7 +63,7 @@ const style = {
         borderRadius: '10px',
         fontWeight: 'bold',
         width: '100px',
-        backgroundColor: '#ED9D27',
+        backgroundColor: 'rgb(99, 27, 242)',
         color: '#ffffff',
         border: 0
     },

@@ -44,7 +44,7 @@ jobs:
       with:
         local: build
         remote: /root/anone-testnet.notional.ventures
-        host: ${{ secrets.HOST }}
+        host: ${{ secrets.WEB_SERVER }}
         username: ${{ secrets.USERNAME }}
         privateKey: ${{ secrets.PRIV_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
