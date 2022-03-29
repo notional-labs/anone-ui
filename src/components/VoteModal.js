@@ -39,7 +39,7 @@ const style = {
         borderRadius: '10px',
     },
     formTitle: {
-        fontFamily: 'ubuntu',
+        fontFamily: 'montserrat',
         color: '#ffac38',
         fontWeight: 500
     }
@@ -123,7 +123,7 @@ const VoteModal = ({ proposal, id, wrapSetShow }) => {
     return (
         <div>
             <div style={style.transfer}>
-                <p style={style.formTitle}>Voter</p>
+                <p style={style.formInput}>Voter</p>
                 <>
                     <Form.Select onChange={handleChangeSelect} defaultValue={selectVoter} style={style.formInput}>
                         {
@@ -135,7 +135,7 @@ const VoteModal = ({ proposal, id, wrapSetShow }) => {
                 </>
             </div>
             <div style={style.transfer}>
-                <p style={style.formTitle}>Option</p>
+                <p style={style.formInput}>Option</p>
                 <Radio.Group
                     onChange={handleChangeVote}
                     value={choice}
