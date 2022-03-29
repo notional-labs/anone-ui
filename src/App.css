@@ -136,16 +136,16 @@
 }
 
 .ant-radio-checked .ant-radio-inner{
-  border-color: #ffac38 !important ;
-  background-color: #ffac38 !important ;
+  border-color: #5dfc8a !important ;
+  background-color: #5dfc8a !important ;
 }
 
 .ant-radio-checked .ant-radio-inner:after{
-  background-color: #ffac38;
+  background-color: #5dfc8a;
 }
 
 .ant-radio:hover .ant-radio-inner {
-  border-color: #ffac38 ;
+  border-color: #5dfc8a ;
 }
 
 @keyframes faded {
