@@ -37,6 +37,12 @@ const style = {
     paddingTop: 0,
     paddingBottom: 50,
     backgroundColor: '#4D4D4D',
+    position: 'fixed',
+    zIndex: 1,
+    top: 0,
+    left: 0,
+    overflowX: 'hidden',
+    width: '300px'
   },
   tabButton: {
     display: 'flex',
@@ -243,7 +249,7 @@ const App = () => {
           </ul>
         </div>
       </div>
-      <div style={{ margin: '0 auto', width: '100%', overflow: 'hidden', position: 'relative' }}>
+      <div style={{ margin: '0 auto', width: '100%', overflow: 'hidden', position: 'relative', marginLeft: '300px' }}>
         <div style={{position: 'relative', zIndex: 1}}>
           <Routes>
             <Route exact path="/" element={<FrontPage />} />
