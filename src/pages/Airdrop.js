@@ -5,12 +5,13 @@ import ClipLoader from "react-spinners/ClipLoader";
 import checkIcon from "../assets/img/check.png";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { Image } from "antd";
+import { getClaimableForAction, getClaimRecord } from "../helpers/airdrop";
+import { Link } from "react-router-dom";
 import {
   ACTION,
-  getClaimableForAction,
-  getClaimRecord,
-} from "../helpers/airdrop";
-import { Link } from "react-router-dom";
+  ACTION_REDIRECT,
+  ACTION_TITLE,
+} from "../constants/airdrop.constant";
 
 const style = {
   container: {
@@ -127,7 +128,7 @@ const actionButton = (action) => (
         height: "40px",
         boxShadow: "0px 0px 10px 2px rgba(0, 0, 0, 0.25)",
         cursor: "pointer",
-        width: "80px",
+        width: "100px",
         color: "#ffffff",
       }}
     >
@@ -143,22 +144,6 @@ const infoContainer = ({ title, value }) => (
   </Col>
 );
 
-const ACTION_TITLE = {
-  initClaim: "Init Claim",
-  bid: "Bid an NFT",
-  mint: "Mint an NFT",
-  vote: "Vote for a proposals",
-  stake: "Stake",
-};
-
-const ACTION_REDIRECT = {
-  initClaim: "Init Claim",
-  bid: "",
-  mint: "",
-  vote: "proposals",
-  stake: "staking",
-};
-
 const initMissionInfo = {
   title: "",
   description: "",
@@ -173,10 +158,8 @@ const Airdrop = ({ accounts }) => {
   const [claimableAmount, setClaimableAmount] = useState();
   const [totalClaimed, setTotalClaimed] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [actionBid, setActionBid] = useState({
-    ...initMissionInfo,
-    action: "bid",
-  });
+  const [address, setAddress] = useState("");
+
   const [actionInitClaim, setActionInitClaim] = useState({
     ...initMissionInfo,
     action: "initClaim",
@@ -193,7 +176,6 @@ const Airdrop = ({ accounts }) => {
     ...initMissionInfo,
     action: "stake",
   });
-  const address = accounts[0].account.address;
 
   const getAddressClaimRecord = async (address) => {
     const [_claimableAmount, _actionCompleted] = await getClaimRecord(address);
@@ -210,13 +192,7 @@ const Airdrop = ({ accounts }) => {
       claimeble: resInitClaim,
       isSuccess: _actionCompleted[0],
     });
-    const resBid = await getClaimableForAction(address, ACTION.bid);
-    setActionBid({
-      ...actionBid,
-      isClaimable: resBid > 0,
-      claimeble: resBid,
-      isSuccess: _actionCompleted[0],
-    });
+
     const resMint = await getClaimableForAction(address, ACTION.mint);
     setActionMint({
       ...actionMint,
@@ -238,29 +214,34 @@ const Airdrop = ({ accounts }) => {
       claimeble: resStake,
       isSuccess: _actionCompleted[3],
     });
-    console.log(resBid, resMint, resInitClaim, resStake, resVote);
+
     setTotalClaimed(
       Math.round(
-        (_claimableAmount -
-          resBid -
-          resMint -
-          resInitClaim -
-          resStake -
-          resVote) *
-          10
+        (_claimableAmount - resMint - resInitClaim - resStake - resVote) * 10
       ) / 10
     );
 
-    setProgress((100 * totalFinishMissions) / _actionCompleted.length);
+    if (_actionCompleted.length) {
+      setProgress((100 * totalFinishMissions) / _actionCompleted.length);
+    } else setProgress(0);
   };
 
   const getAction = async () => {};
 
   useEffect(() => {
+    if (accounts.length) {
+      const _address = accounts[0].account?.address || "";
+      setAddress(_address);
+    }
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      await getAddressClaimRecord(address);
-      await getAction();
-      setIsLoading(false);
+      if (address) {
+        await getAddressClaimRecord(address);
+        await getAction();
+        setIsLoading(false);
+      } else setIsLoading(true);
     })();
   }, [address]);
 
@@ -281,17 +262,21 @@ const Airdrop = ({ accounts }) => {
       {isLoading ? (
         <div
           style={{
-            display: "flex",
+            margin: "auto",
             flexDirection: "row",
             justifyContent: "center",
             fontSize: "1rem",
           }}
         >
-          <ClipLoader
-            style={{ marginTop: "5em" }}
-            color={"#f0a848"}
-            loading={isLoading}
-          />
+          <div>
+            <ClipLoader
+              style={{ marginTop: "5em" }}
+              color={"#f0a848"}
+              loading={isLoading}
+            />
+          </div>
+
+          <div>Connect your wallet and wait for us to process</div>
         </div>
       ) : (
         <>
@@ -311,7 +296,6 @@ const Airdrop = ({ accounts }) => {
           </Row>
 
           <div style={style.title}>My missions</div>
-          {/* {missionContainer(actionBid)} */}
           {missionContainer(actionInitClaim)}
           {missionContainer(actionMint)}
           {missionContainer(actionStake)}
