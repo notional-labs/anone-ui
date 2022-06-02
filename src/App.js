@@ -22,6 +22,7 @@ import ProposalList from './pages/ProposalList';
 import { FaDiscord } from "react-icons/fa";
 import ProposalDetail from './pages/ProposalDetail';
 import FrontPage from './pages/FrontPage';
+import Airdrop from './pages/Airdrop';
 
 const style = {
   button: {
@@ -209,6 +210,25 @@ const App = () => {
               </NavLink>
             </li>
             <li style={style.li}>
+              <NavLink to='/airdrop'>
+                <button style={{
+                  fontSize: '20px',
+                  backgroundColor: 'transparent',
+                  color: location.pathname.includes('/airdrop') ? '#5dfc8a' : '#ffffff',
+                  padding: 0,
+                  paddingTop: 5,
+                  paddingBottom: 30,
+                  border: 0,
+                  fontFamily: 'montserrat',
+                  lineHeight: '100%',
+                  fontStyle: 'regular',
+                  fontWeight: 'bold'
+                }} className='nav-link'>
+                  Airdrop
+                </button>
+              </NavLink>
+            </li>
+            <li style={style.li}>
               <ConnectButton wrapSetShow={wrapSetShow} />
             </li>
           </ul>
@@ -258,6 +278,7 @@ const App = () => {
             <Route exact path="/accounts/:id" element={<AccountDetail accounts={accounts} />} />
             <Route exact path="/proposals" element={<ProposalList accounts={accounts} />} />
             <Route exact path="/proposals/:id" element={<ProposalDetail accounts={accounts} />} />
+            <Route exact path="/airdrop" element={<Airdrop accounts={accounts}/>} />
           </Routes>
         </div>
       </div>

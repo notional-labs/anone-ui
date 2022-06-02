@@ -98,7 +98,7 @@ const style = {
     }
 }
 
-const ProposalCard = ({ proposal, wrapSetShow, wrapSetSelect, wrapSetShowDeposit, index, bond }) => {
+const       ProposalCard = ({ proposal, wrapSetShow, wrapSetSelect, wrapSetShowDeposit, index, bond }) => {
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
